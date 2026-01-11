@@ -1,6 +1,16 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import NavToggle from "../../components/NavToggle.astro";
+import { getCollection } from 'astro:content';
+
+const notes = await getCollection('notes');
+const sortedNotes = notes.sort((a, b) => (a.data.order ?? 0) - (b.data.order ?? 0));
+
+// 获取所有分类
+const categories = sortedNotes.map(note => ({
+  title: note.data.title,
+  category: note.data.category
+}));
 ---
 
 <BaseLayout title="Notes">
@@ -15,8 +25,39 @@ import NavToggle from "../../components/NavToggle.astro";
   <!-- 固定导航按钮 -->
   <NavToggle />
 
-  <!-- 第二屏：纯色页面 -->
-  <section class="solid-screen"></section>
+  <!-- 第二屏：纯色页面 - 专题列表 -->
+  <section class="content-screen">
+    <div class="notes-container">
+      <!-- 科目按钮导航 -->
+      <div class="category-buttons">
+        <button class="category-btn active" data-category="all">All</button>
+        {categories.map((cat) => (
+          <button class="category-btn" data-category={cat.category}>
+            {cat.title}
+          </button>
+        ))}
+      </div>
+
+      <!-- 笔记列表 -->
+      <div class="notes-list">
+        {sortedNotes.map((note) => (
+          <div class="note-section" data-category={note.data.category}>
+            <h3 class="note-section-title">{note.data.title}</h3>
+            <div class="note-items">
+              {note.body.split('\n').map((item: string) => {
+                const trimmed = item.trim();
+                return trimmed.startsWith('- ') ? (
+                  <div class="note-item">
+                    {trimmed.substring(2)}
+                  </div>
+                ) : null;
+              })}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
 </BaseLayout>
 
 <script>
@@ -59,45 +100,167 @@ import NavToggle from "../../components/NavToggle.astro";
       parallaxBg.style.transform = `translate3d(0, -${scrolled}px, 0)`;
     }, { passive: true });
   }
+
+  // 科目过滤功能
+  document.querySelectorAll('.category-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+      const selectedCategory = this.dataset.category;
+      
+      // 更新按钮状态
+      document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
+      this.classList.add('active');
+      
+      // 过滤笔记
+      document.querySelectorAll('.note-section').forEach(section => {
+        if (selectedCategory === 'all' || section.dataset.category === selectedCategory) {
+          section.style.display = 'block';
+        } else {
+          section.style.display = 'none';
+        }
+      });
+    });
+  });
 </script>
 
 <style>
   .hero {
-    padding: 60px 0 40px;
-    text-align: center;
+    padding: 0;
+    text-align: left;
     position: relative;
     z-index: 2;
-    height: 100vh;
+    height: 60vh;
     width: 100vw;
     margin-left: calc(-50vw + 50%);
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    align-items: center;
+    justify-content: flex-end;
+    align-items: flex-start;
+    padding-left: 40px;
+    padding-bottom: 30px;
   }
 
   .hero h1 {
     font-size: 48px;
-    margin: 0 0 16px;
-    background: linear-gradient(135deg, var(--text), rgba(255, 255, 255, 0.7));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    margin: 0;
+    color: #ffffff;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
   }
 
   /* 第二屏纯色页面 */
-  .solid-screen {
+  .content-screen {
     min-height: 100vh;
     width: 100vw;
     background-color: var(--bg);
     position: relative;
     z-index: 2;
     margin-left: calc(-50vw + 50%);
+    padding: 0;
+  }
+
+  html[data-theme="light"] .content-screen {
+    background-color: #ffffff;
+  }
+
+  .notes-container {
+    padding: 30px 40px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  /* 科目按钮导航 */
+  .category-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 40px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .category-btn {
+    padding: 8px 16px;
+    border: 1px solid var(--text);
+    background-color: transparent;
+    color: var(--text);
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+  }
+
+  .category-btn:hover {
+    background-color: var(--text);
+    color: var(--bg);
+  }
+
+  .category-btn.active {
+    background-color: var(--text);
+    color: var(--bg);
+  }
+
+  /* 笔记列表 */
+  .notes-list {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+  }
+
+  .note-section {
+    transition: all 0.3s ease;
+  }
+
+  .note-section-title {
+    font-size: 24px;
+    font-weight: 600;
+    margin: 0 0 16px 0;
+    color: var(--text);
+  }
+
+  .note-items {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding-left: 16px;
+  }
+
+  .note-item {
+    font-size: 15px;
+    color: var(--text);
+    opacity: 0.8;
+    padding-left: 12px;
+    border-left: 3px solid var(--text);
   }
 
   @media (max-width: 640px) {
     .hero h1 {
       font-size: 32px;
+    }
+
+    .notes-container {
+      padding: 40px 20px;
+    }
+
+    .category-buttons {
+      gap: 8px;
+      margin-bottom: 30px;
+    }
+
+    .category-btn {
+      padding: 6px 12px;
+      font-size: 13px;
+    }
+
+    .notes-list {
+      gap: 24px;
+    }
+
+    .note-section-title {
+      font-size: 20px;
+    }
+
+    .note-item {
+      font-size: 14px;
     }
   }
 </style>

@@ -1,10 +1,13 @@
 /* Dark mode (default) */
 :root {
-  --bg:#0b0f19;
+  --bg:#1a1a1a;
   --text:rgba(255,255,255,.88);
   --muted:rgba(255,255,255,.62);
   --stroke:rgba(255,255,255,.14);
   --shadow:rgba(0,0,0,.38);
+  --accent:#6366f1;
+  --card-bg:rgba(255,255,255,.05);
+  --border:rgba(255,255,255,.1);
   color-scheme: dark;
 }
 
@@ -15,6 +18,9 @@ html[data-theme="light"] {
   --muted:rgba(60,60,80,.68);
   --stroke:rgba(0,0,0,.08);
   --shadow:rgba(0,0,0,.12);
+  --accent:#4f46e5;
+  --card-bg:rgba(0,0,0,.02);
+  --border:rgba(0,0,0,.1);
   color-scheme: light;
 }
 
