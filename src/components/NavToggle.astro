@@ -57,19 +57,40 @@
       const rect = button.getBoundingClientRect();
       const containerRect = container.getBoundingClientRect();
       
-      slider.style.left = (rect.left - containerRect.left) + 'px';
+      const leftPos = rect.left - containerRect.left;
+      const rightPos = leftPos + rect.width;
+      const containerWidth = containerRect.width;
+      
+      // 确保滑块不超出容器边界
+      const maxLeft = containerWidth - rect.width - 6; // 减去右侧padding
+      const finalLeft = Math.min(leftPos, maxLeft);
+      
+      slider.style.left = finalLeft + 'px';
       slider.style.width = rect.width + 'px';
       slider.style.height = rect.height + 'px';
       
-      // 水珠微动效果
+      // 水珠微动效果 - 进入时抵触（反方向）
       if (withLiquidEffect && mouseDirection !== 0) {
-        const offset = mouseDirection * 2; // 2px的微动
+        const offset = -mouseDirection * 3; // 反方向移动3px（抵触）
         slider.style.transform = `translateY(${offset}px)`;
         
-        // 300ms后恢复
+        // 150ms后回弹
         setTimeout(() => {
           slider.style.transform = 'translateY(0)';
-        }, 300);
+        }, 150);
+      }
+    };
+
+    const sliderLeaveEffect = () => {
+      // 离开时留恋（顺着方向）
+      if (mouseDirection !== 0) {
+        const offset = mouseDirection * 3; // 顺着方向移动3px（留恋）
+        slider.style.transform = `translateY(${offset}px)`;
+        
+        // 200ms后回弹
+        setTimeout(() => {
+          slider.style.transform = 'translateY(0)';
+        }, 200);
       }
     };
 
@@ -112,6 +133,16 @@
       button.addEventListener('mouseenter', () => {
         updateSlider(button, true);
       });
+
+      // 鼠标离开时的留恋效果
+      button.addEventListener('mouseleave', () => {
+        sliderLeaveEffect();
+      });
+    });
+
+    // 容器整体离开时立即恢复滑块
+    container.addEventListener('mouseleave', () => {
+      slider.style.transform = 'translateY(0)';
     });
 
     // 初始化活跃按钮和滑块
@@ -154,11 +185,11 @@
     -webkit-backdrop-filter: blur(20px) saturate(180%);
     animation: fadeIn 1.5s ease-out 0.2s both;
     transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    box-sizing: border-box;
   }
 
   .nav-toggle-container:hover {
     transform: translateX(-50%) translateY(-4px) scale(1.02);
-    padding: 8px;
   }
 
   @keyframes fadeIn {
