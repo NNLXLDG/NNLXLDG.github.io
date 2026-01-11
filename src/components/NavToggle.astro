@@ -31,6 +31,18 @@
       return;
     }
 
+    // 追踪鼠标Y坐标变化
+    let lastMouseY = 0;
+    let mouseDirection = 0; // 1: 向下, -1: 向上
+
+    container.addEventListener('mousemove', (e) => {
+      const currentY = e.clientY;
+      if (lastMouseY !== 0) {
+        mouseDirection = currentY > lastMouseY ? 1 : -1;
+      }
+      lastMouseY = currentY;
+    });
+
     // 根据当前路径确定活跃按钮
     const getActiveBtnTarget = () => {
       const path = window.location.pathname;
@@ -41,13 +53,24 @@
       return 'blog';
     };
 
-    const updateSlider = (button) => {
+    const updateSlider = (button, withLiquidEffect = false) => {
       const rect = button.getBoundingClientRect();
       const containerRect = container.getBoundingClientRect();
       
       slider.style.left = (rect.left - containerRect.left) + 'px';
       slider.style.width = rect.width + 'px';
       slider.style.height = rect.height + 'px';
+      
+      // 水珠微动效果
+      if (withLiquidEffect && mouseDirection !== 0) {
+        const offset = mouseDirection * 2; // 2px的微动
+        slider.style.transform = `translateY(${offset}px)`;
+        
+        // 300ms后恢复
+        setTimeout(() => {
+          slider.style.transform = 'translateY(0)';
+        }, 300);
+      }
     };
 
     const navigate = (target) => {
@@ -85,9 +108,9 @@
         navigate(target);
       });
 
-      // 鼠标悬停吸附效果
+      // 鼠标悬停吸附效果 - 添加水珠效果
       button.addEventListener('mouseenter', () => {
-        updateSlider(button);
+        updateSlider(button, true);
       });
     });
 
@@ -206,17 +229,18 @@
     position: absolute;
     top: 6px;
     left: 6px;
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.06));
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.04));
+    border: 1px solid rgba(255, 255, 255, 0.12);
     border-radius: 999px;
-    backdrop-filter: blur(16px) saturate(140%);
-    -webkit-backdrop-filter: blur(16px) saturate(140%);
+    backdrop-filter: blur(8px) saturate(150%);
+    -webkit-backdrop-filter: blur(8px) saturate(150%);
     box-shadow: 
-      0 8px 20px rgba(0, 0, 0, 0.15),
-      inset 0 1px 0 rgba(255, 255, 255, 0.15),
-      inset 0 -1px 0 rgba(0, 0, 0, 0.05);
+      0 4px 16px rgba(255, 255, 255, 0.05),
+      0 8px 24px rgba(0, 0, 0, 0.2),
+      inset 0 1px 1px rgba(255, 255, 255, 0.2),
+      inset 0 -1px 1px rgba(0, 0, 0, 0.08);
     z-index: 1;
-    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
     pointer-events: none;
   }
 
@@ -224,10 +248,10 @@
     content: '';
     position: absolute;
     inset: -40%;
-    background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.2), transparent 60%);
+    background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.15), transparent 50%);
     border-radius: 50%;
-    filter: blur(8px);
-    opacity: 0.7;
+    filter: blur(12px);
+    opacity: 0.6;
     animation: liquidPulse 3s ease-in-out infinite;
   }
 
