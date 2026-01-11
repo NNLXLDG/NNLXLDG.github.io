@@ -1,0 +1,249 @@
+---
+// Liquid Glass 风格的笔记/画廊切换按钮
+---
+
+<div class="nav-toggle-container">
+  <button class="nav-toggle-btn" data-target="blog">
+    <span>📝 Blog</span>
+  </button>
+  <button class="nav-toggle-btn" data-target="notes">
+    <span>📋 Notes</span>
+  </button>
+  <button class="nav-toggle-btn" data-target="photos">
+    <span>📷 Photos</span>
+  </button>
+  <button class="nav-toggle-btn" data-target="mcgames">
+    <span>🎮 MC Games</span>
+  </button>
+  <div class="toggle-slider"></div>
+</div>
+
+<script is:inline>
+  const initNavToggle = () => {
+    const container = document.querySelector('.nav-toggle-container');
+    const buttonsNodeList = document.querySelectorAll('.nav-toggle-btn');
+    const buttons = Array.from(buttonsNodeList); // 转换为数组
+    const slider = document.querySelector('.toggle-slider');
+    
+    if (!container || !buttons.length || !slider) {
+      // 如果还没加载，延迟再试一次
+      setTimeout(initNavToggle, 100);
+      return;
+    }
+
+    // 根据当前路径确定活跃按钮
+    const getActiveBtnTarget = () => {
+      const path = window.location.pathname;
+      if (path === '/') return 'blog';
+      if (path.startsWith('/notes')) return 'notes';
+      if (path.startsWith('/photos')) return 'photos';
+      if (path.startsWith('/mc')) return 'mcgames';
+      return 'blog';
+    };
+
+    const updateSlider = (button) => {
+      const rect = button.getBoundingClientRect();
+      const containerRect = container.getBoundingClientRect();
+      
+      slider.style.left = (rect.left - containerRect.left) + 'px';
+      slider.style.width = rect.width + 'px';
+      slider.style.height = rect.height + 'px';
+    };
+
+    const navigate = (target) => {
+      // 添加淡出效果
+      container.classList.add('fade-out');
+      
+      setTimeout(() => {
+        // 触发导航
+        let href = '/';
+        if (target === 'notes') href = '/notes';
+        else if (target === 'photos') href = '/photos';
+        else if (target === 'mcgames') href = '/mc';
+        
+        window.location.href = href;
+      }, 300);
+    };
+
+    buttons.forEach((button) => {
+      button.addEventListener('click', () => {
+        const target = button.getAttribute('data-target');
+        const currentTarget = getActiveBtnTarget();
+        
+        if (target === currentTarget) return;
+
+        // 移除所有活跃状态
+        buttons.forEach(btn => btn.classList.remove('active'));
+        
+        // 添加活跃状态
+        button.classList.add('active');
+
+        // 更新滑块位置
+        updateSlider(button);
+
+        // 页面过渡效果
+        navigate(target);
+      });
+
+      // 鼠标悬停吸附效果
+      button.addEventListener('mouseenter', () => {
+        updateSlider(button);
+      });
+    });
+
+    // 初始化活跃按钮和滑块
+    const currentTarget = getActiveBtnTarget();
+    
+    // 延迟后找到对应的按钮并更新滑块
+    const initializeSlider = () => {
+      const buttonToUpdate = buttons.find(btn => btn.getAttribute('data-target') === currentTarget);
+      if (buttonToUpdate) {
+        buttonToUpdate.classList.add('active');
+        updateSlider(buttonToUpdate);
+      }
+    };
+    
+    // 延迟 200ms 确保元素完全渲染
+    setTimeout(initializeSlider, 200);
+  };
+
+  // 在脚本加载完立即尝试初始化
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initNavToggle);
+  } else {
+    initNavToggle();
+  }
+</script>
+
+<style>
+  .nav-toggle-container {
+    position: fixed;
+    bottom: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 100;
+    display: inline-flex;
+    gap: 0;
+    padding: 6px;
+    border-radius: 999px;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.02));
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+    animation: fadeIn 1.5s ease-out 0.2s both;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateX(-50%) translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+  }
+
+  @keyframes fadeOut {
+    from {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+    to {
+      opacity: 0;
+      transform: translateX(-50%) translateY(20px);
+    }
+  }
+
+  .nav-toggle-container.fade-out {
+    animation: fadeOut 1.5s ease-out forwards;
+  }
+
+  html[data-theme="light"] .nav-toggle-container {
+    background: linear-gradient(180deg, rgba(100, 120, 200, 0.08), rgba(100, 120, 200, 0.02));
+    border-color: rgba(100, 120, 200, 0.15);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(100, 120, 200, 0.15);
+  }
+
+  .nav-toggle-btn {
+    position: relative;
+    z-index: 2;
+    padding: 0.6rem 1rem;
+    border: none;
+    background: transparent;
+    color: var(--muted);
+    cursor: pointer;
+    border-radius: 999px;
+    font-size: inherit;
+    font-weight: 500;
+    transition: color 0.3s ease, text-shadow 0.3s ease;
+    white-space: nowrap;
+  }
+
+  .nav-toggle-btn:hover {
+    text-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
+  }
+
+  .nav-toggle-btn.active {
+    color: var(--text);
+  }
+
+  html[data-theme="light"] .nav-toggle-btn.active {
+    color: rgba(20, 20, 30, 0.95);
+    font-weight: 600;
+  }
+
+  .toggle-slider {
+    position: absolute;
+    top: 6px;
+    left: 6px;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.06));
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 999px;
+    backdrop-filter: blur(16px) saturate(140%);
+    -webkit-backdrop-filter: blur(16px) saturate(140%);
+    box-shadow: 
+      0 8px 20px rgba(0, 0, 0, 0.15),
+      inset 0 1px 0 rgba(255, 255, 255, 0.15),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.05);
+    z-index: 1;
+    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    pointer-events: none;
+  }
+
+  .toggle-slider::before {
+    content: '';
+    position: absolute;
+    inset: -40%;
+    background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.2), transparent 60%);
+    border-radius: 50%;
+    filter: blur(8px);
+    opacity: 0.7;
+    animation: liquidPulse 3s ease-in-out infinite;
+  }
+
+  @keyframes liquidPulse {
+    0%, 100% {
+      transform: scale(0.9);
+      opacity: 0.5;
+    }
+    50% {
+      transform: scale(1.1);
+      opacity: 0.8;
+    }
+  }
+
+  /* 响应式设计 */
+  @media (max-width: 640px) {
+    .nav-toggle-container {
+      gap: 0;
+      padding: 4px;
+    }
+
+    .nav-toggle-btn {
+      padding: 0.5rem 0.8rem;
+      font-size: 0.95em;
+    }
+  }
+</style>

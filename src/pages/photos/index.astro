@@ -1,0 +1,76 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import NavToggle from "../../components/NavToggle.astro";
+---
+
+<BaseLayout title="Photos">
+  <!-- 背景图片层 -->
+  <div class="parallax-bg" style="background-image: url('/bg_photos/122.jpg');"></div>
+
+  <!-- 第一屏：内容层 -->
+  <section class="hero">
+    <h1>Photos</h1>
+  </section>
+
+  <!-- 固定导航按钮 -->
+  <NavToggle />
+
+  <!-- 第二屏：纯色页面 -->
+  <section class="solid-screen"></section>
+</BaseLayout>
+
+<script>
+  // 背景图片视差滚动效果
+  const parallaxBg = document.querySelector('.parallax-bg');
+  if (parallaxBg) {
+    // 立即设置初始transform
+    parallaxBg.style.transform = 'translate3d(0, 0, 0)';
+    
+    // 只在滚动时更新
+    window.addEventListener('scroll', () => {
+      const scrolled = window.scrollY;
+      parallaxBg.style.transform = `translate3d(0, -${scrolled}px, 0)`;
+    }, { passive: true });
+  }
+</script>
+
+<style>
+  .hero {
+    padding: 60px 0 40px;
+    text-align: center;
+    position: relative;
+    z-index: 2;
+    height: 100vh;
+    width: 100vw;
+    margin-left: calc(-50vw + 50%);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .hero h1 {
+    font-size: 48px;
+    margin: 0 0 16px;
+    background: linear-gradient(135deg, var(--text), rgba(255, 255, 255, 0.7));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* 第二屏纯色页面 */
+  .solid-screen {
+    min-height: 100vh;
+    width: 100vw;
+    background-color: var(--bg);
+    position: relative;
+    z-index: 2;
+    margin-left: calc(-50vw + 50%);
+  }
+
+  @media (max-width: 640px) {
+    .hero h1 {
+      font-size: 32px;
+    }
+  }
+</style>

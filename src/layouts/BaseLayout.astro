@@ -1,0 +1,79 @@
+---
+import "../styles/global.css";
+import ThemeSwitcher from "../components/ThemeSwitcher.astro";
+
+const { title = "Home" } = Astro.props;
+---
+
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>{title}</title>
+    <style>
+      html, body {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="nav">
+        <a class="brand" href="/">Xie's Blog</a>
+        <div class="row nav-right">
+          <a href="/about">About me</a>
+          <ThemeSwitcher />
+        </div>
+      </div>
+
+      <slot />
+    </div>
+
+    <script is:inline>
+      // 初始化主题
+      const initTheme = () => {
+        const html = document.documentElement;
+        const savedTheme = localStorage.getItem('theme');
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const theme = savedTheme || (prefersDark ? 'dark' : 'light');
+        html.setAttribute('data-theme', theme);
+      };
+
+      // 初始化导航按钮状态
+      const initNavStatus = () => {
+        const path = window.location.pathname;
+        const buttons = document.querySelectorAll('.nav-toggle-btn');
+        
+        buttons.forEach(btn => {
+          btn.classList.remove('active');
+          const target = btn.getAttribute('data-target');
+          
+          if ((target === 'blog' && path === '/') ||
+              (target === 'notes' && path.includes('/notes')) ||
+              (target === 'photos' && path.includes('/photos')) ||
+              (target === 'mcgames' && path.includes('/mc'))) {
+            btn.classList.add('active');
+          }
+        });
+      };
+
+      initTheme();
+      initNavStatus();
+      document.addEventListener('DOMContentLoaded', () => {
+        initTheme();
+        initNavStatus();
+      });
+    </script>
+
+    <style>
+      .nav-right {
+        align-items: center;
+        gap: 16px;
+      }
+    </style>
+  </body>
+</html>
