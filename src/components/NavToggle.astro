@@ -93,13 +93,17 @@
         if (btn === activeButton) {
           // 活跃按钮：根据主题使用相反颜色
           if (isDarkMode) {
-            btn.style.color = 'rgba(20, 20, 30, 0.95)'; // 深色模式下用深色文字
+            btn.style.color = 'rgba(255, 255, 255, 0.95)'; // 深色模式下用白色文字
           } else {
-            btn.style.color = 'rgba(255, 255, 255, 0.95)'; // 浅色模式下用白色文字
+            btn.style.color = 'rgba(20, 20, 30, 0.95)'; // 浅色模式下用黑色文字
           }
         } else {
-          // 非活跃按钮：使用 muted 色
-          btn.style.color = 'var(--muted)';
+          // 非活跃按钮：纯黑或纯白
+          if (isDarkMode) {
+            btn.style.color = '#000000'; // 深色模式下用纯黑
+          } else {
+            btn.style.color = '#ffffff'; // 浅色模式下用纯白
+          }
         }
       });
     };
@@ -118,6 +122,14 @@
     };
 
     const navigate = (target) => {
+      // 在导航前，如果离开Photos页面，恢复之前的主题
+      const currentPath = window.location.pathname;
+      if (currentPath.includes('/photos') && target !== 'photos') {
+        const themeToRestore = localStorage.getItem('previousThemeBeforePhotos') || 'dark';
+        document.documentElement.setAttribute('data-theme', themeToRestore);
+        localStorage.setItem('theme', themeToRestore);
+      }
+      
       // 添加淡出效果
       container.classList.add('fade-out');
       
