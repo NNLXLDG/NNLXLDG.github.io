@@ -34,6 +34,7 @@
     // 追踪鼠标Y坐标变化
     let lastMouseY = 0;
     let mouseDirection = 0; // 1: 向下, -1: 向上
+    let returnToPageSliderTimer = null;
 
     container.addEventListener('mousemove', (e) => {
       const currentY = e.clientY;
@@ -69,6 +70,9 @@
       slider.style.width = rect.width + 'px';
       slider.style.height = rect.height + 'px';
       
+      // 更新按钮字体颜色：滑块在哪个按钮上，那个按钮的字体反转
+      updateButtonTextColors(button);
+      
       // 水珠微动效果 - 进入时抵触（反方向）
       if (withLiquidEffect && mouseDirection !== 0) {
         const offset = -mouseDirection * 3; // 反方向移动3px（抵触）
@@ -79,6 +83,25 @@
           slider.style.transform = 'translateY(0)';
         }, 150);
       }
+    };
+
+    // 更新按钮字体颜色
+    const updateButtonTextColors = (activeButton) => {
+      const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
+      
+      buttons.forEach((btn) => {
+        if (btn === activeButton) {
+          // 活跃按钮：根据主题使用相反颜色
+          if (isDarkMode) {
+            btn.style.color = 'rgba(20, 20, 30, 0.95)'; // 深色模式下用深色文字
+          } else {
+            btn.style.color = 'rgba(255, 255, 255, 0.95)'; // 浅色模式下用白色文字
+          }
+        } else {
+          // 非活跃按钮：使用 muted 色
+          btn.style.color = 'var(--muted)';
+        }
+      });
     };
 
     const sliderLeaveEffect = () => {
@@ -109,6 +132,24 @@
       }, 300);
     };
 
+    // 返回到当前页面按钮的滑块位置
+    const returnSliderToCurrentPage = () => {
+      const currentTarget = getActiveBtnTarget();
+      const buttonToReturn = buttons.find(btn => btn.getAttribute('data-target') === currentTarget);
+      if (buttonToReturn) {
+        // 临时改变过渡效果为 ease-out（先快后慢）
+        const originalTransition = slider.style.transition;
+        slider.style.transition = 'all 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s cubic-bezier(0.16, 1, 0.3, 1)';
+        
+        updateSlider(buttonToReturn, false);
+        
+        // 动画完成后恢复原始过渡效果
+        setTimeout(() => {
+          slider.style.transition = originalTransition;
+        }, 600);
+      }
+    };
+
     buttons.forEach((button) => {
       button.addEventListener('click', () => {
         const target = button.getAttribute('data-target');
@@ -131,6 +172,11 @@
 
       // 鼠标悬停吸附效果 - 添加水珠效果
       button.addEventListener('mouseenter', () => {
+        // 清除之前的返回计时器
+        if (returnToPageSliderTimer) {
+          clearTimeout(returnToPageSliderTimer);
+          returnToPageSliderTimer = null;
+        }
         updateSlider(button, true);
       });
 
@@ -140,9 +186,41 @@
       });
     });
 
-    // 容器整体离开时立即恢复滑块
+    // 容器整体离开时
     container.addEventListener('mouseleave', () => {
       slider.style.transform = 'translateY(0)';
+      
+      // 清除之前的计时器
+      if (returnToPageSliderTimer) {
+        clearTimeout(returnToPageSliderTimer);
+      }
+      
+      // 3秒后如果鼠标还不在容器内，则返回到当前页面按钮
+      returnToPageSliderTimer = setTimeout(() => {
+        returnSliderToCurrentPage();
+      }, 3000);
+    });
+
+    // 鼠标重新进入容器时，取消返回计时器
+    container.addEventListener('mouseenter', () => {
+      if (returnToPageSliderTimer) {
+        clearTimeout(returnToPageSliderTimer);
+        returnToPageSliderTimer = null;
+      }
+    });
+
+    // 监听主题变化，更新按钮文字颜色
+    const observer = new MutationObserver(() => {
+      const currentTarget = getActiveBtnTarget();
+      const buttonToUpdate = buttons.find(btn => btn.getAttribute('data-target') === currentTarget);
+      if (buttonToUpdate) {
+        updateButtonTextColors(buttonToUpdate);
+      }
+    });
+
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['data-theme']
     });
 
     // 初始化活跃按钮和滑块
@@ -154,6 +232,7 @@
       if (buttonToUpdate) {
         buttonToUpdate.classList.add('active');
         updateSlider(buttonToUpdate);
+        updateButtonTextColors(buttonToUpdate);
       }
     };
     
