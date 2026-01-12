@@ -76,8 +76,8 @@ import NavToggle from "../components/NavToggle.astro";
 
 <style>
   .hero {
-    padding: 60px 0 40px;
-    text-align: center;
+    padding: 0;
+    text-align: left;
     position: relative;
     z-index: 2;
     height: 100vh;
@@ -86,17 +86,21 @@ import NavToggle from "../components/NavToggle.astro";
     display: flex;
     flex-direction: column;
     justify-content: center;
-    align-items: center;
+    align-items: flex-start;
+    padding-left: 40px;
+    transform: translateY(60px);
   }
 
   .hero h1 {
     font-size: 48px;
-    margin: 0 0 16px;
+    margin: 0;
     color: #ffffff;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
   }
 
   html[data-theme="light"] .hero h1 {
-    color: #000000;
+    color: #ffffff;
+    text-shadow: 0 2px 8px rgba(255, 255, 255, 0.5);
   }
 
 
