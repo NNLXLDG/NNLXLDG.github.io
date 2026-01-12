@@ -5,7 +5,7 @@ import NavToggle from "../components/NavToggle.astro";
 
 <BaseLayout title="Home">
   <!-- 背景图片层 -->
-  <div class="parallax-bg" style="background-image: url('/bg_photos/front.jpg');"></div>
+  <div class="parallax-bg" id="parallax-bg"></div>
 
   <!-- 第一屏：内容层 -->
   <section class="hero">
@@ -20,12 +20,44 @@ import NavToggle from "../components/NavToggle.astro";
 </BaseLayout>
 
 <script>
-  // 背景图片视差滚动效果
+  // 背景图片设置和视差滚动效果
   const parallaxBg = document.querySelector('.parallax-bg');
   if (parallaxBg) {
-    // 立即设置初始transform，防止任何跳变
-    parallaxBg.style.transform = 'translate3d(0, 0, 0)';
-    
+    // 根据主题模式设置背景图片
+    function setBackgroundImage() {
+      const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
+      const backgroundImage = isDarkMode ? '/bg_photos/front2.jpg' : '/bg_photos/front1.jpg';
+      
+      // 使用opacity淡出
+      parallaxBg.style.opacity = '0';
+      setTimeout(() => {
+        parallaxBg.style.backgroundImage = `url('${backgroundImage}')`;
+        parallaxBg.style.opacity = '1';
+      }, 250);
+    }
+
+    // 初始化背景
+    setBackgroundImage();
+
+    // 监听主题变化
+    const observer = new MutationObserver(() => {
+      setBackgroundImage();
+    });
+
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['data-theme']
+    });
+
+    // 监听container的动画结束
+    const container = document.querySelector('.container');
+    if (container) {
+      container.addEventListener('animationend', () => {
+        const scrolled = window.scrollY;
+        parallaxBg.style.transform = `translate3d(0, -${scrolled}px, 0)`;
+      });
+    }
+
     // 只在滚动时更新
     window.addEventListener('scroll', () => {
       const scrolled = window.scrollY;
