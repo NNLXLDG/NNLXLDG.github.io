@@ -9,7 +9,7 @@ import NavToggle from "../components/NavToggle.astro";
 
   <!-- 第一屏：内容层 -->
   <section class="hero">
-    <h1>Welcome to Xie's Blog</h1>
+    <h1>Xie's Blog</h1>
   </section>
 
   <!-- 固定导航按钮 -->
@@ -92,11 +92,16 @@ import NavToggle from "../components/NavToggle.astro";
   .hero h1 {
     font-size: 48px;
     margin: 0 0 16px;
-    background: linear-gradient(135deg, var(--text), rgba(255, 255, 255, 0.7));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    color: #ffffff;
   }
+
+  html[data-theme="light"] .hero h1 {
+    color: #000000;
+  }
+
+
+
+
 
   .hero p {
     margin: 0;
