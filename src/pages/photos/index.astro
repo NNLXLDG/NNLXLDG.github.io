@@ -15,23 +15,11 @@ import NavToggle from "../../components/NavToggle.astro";
   <!-- 固定导航按钮 -->
   <NavToggle />
 
-  <!-- 图片拼接区域 - 放在 body 最后，突破 container 限制 -->
+  <!-- 图片拼接区域 -->
+  <section class="photos-container" id="photos-container"></section>
 </BaseLayout>
 
-<!-- 图片容器 - 在 BaseLayout 之外 -->
-<section class="photos-container" id="photos-container"></section>
-
 <script>
-  // 保存进入Photos页面前的主题
-  let previousTheme = localStorage.getItem('theme') || 'dark';
-  
-  // 进入Photos页面时切换到深色模式
-  const html = document.documentElement;
-  previousTheme = html.getAttribute('data-theme') || previousTheme;
-  html.setAttribute('data-theme', 'dark');
-  localStorage.setItem('theme', 'dark');
-  localStorage.setItem('previousThemeBeforePhotos', previousTheme);
-
   // 背景图片视差滚动效果
   const parallaxBg = document.querySelector('.parallax-bg');
   if (parallaxBg) {
@@ -44,17 +32,6 @@ import NavToggle from "../../components/NavToggle.astro";
       parallaxBg.style.transform = `translate3d(0, -${scrolled}px, 0)`;
     }, { passive: true });
   }
-
-  // 监听beforeunload事件，在离开页面时恢复之前的主题
-  window.addEventListener('beforeunload', () => {
-    // 获取当前路径
-    const path = window.location.pathname;
-    // 如果不是photos页面，恢复之前的主题
-    if (!path.includes('/photos')) {
-      html.setAttribute('data-theme', previousTheme);
-      localStorage.setItem('theme', previousTheme);
-    }
-  });
 
   // 照片拼接逻辑
   const container = document.getElementById('photos-container');

@@ -35,6 +35,8 @@
     let lastMouseY = 0;
     let mouseDirection = 0; // 1: 向下, -1: 向上
     let returnToPageSliderTimer = null;
+    let hoveredButton = null; // 追踪当前悬停的按钮
+    let sliderCurrentButton = null; // 追踪滑块当前所在的按钮
 
     container.addEventListener('mousemove', (e) => {
       const currentY = e.clientY;
@@ -70,6 +72,9 @@
       slider.style.width = rect.width + 'px';
       slider.style.height = rect.height + 'px';
       
+      // 记录滑块当前所在的按钮
+      sliderCurrentButton = button;
+      
       // 更新按钮字体颜色：滑块在哪个按钮上，那个按钮的字体反转
       updateButtonTextColors(button);
       
@@ -85,24 +90,126 @@
       }
     };
 
+    // 计算颜色的亮度
+    const getLuminance = (color) => {
+      const rgb = getRGB(color);
+      if (!rgb) return 0;
+      
+      // 使用相对亮度公式
+      const [r, g, b] = [rgb.r, rgb.g, rgb.b].map(val => {
+        val = val / 255;
+        return val <= 0.03928 ? val / 12.92 : Math.pow((val + 0.055) / 1.055, 2.4);
+      });
+      
+      return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+    };
+
+    // 计算两个颜色的相似度（0-1，1为完全相同）
+    const getColorSimilarity = (color1, color2) => {
+      // 将颜色转换为RGB
+      const rgb1 = getRGB(color1);
+      const rgb2 = getRGB(color2);
+      
+      if (!rgb1 || !rgb2) return 0;
+      
+      // 计算欧几里得距离
+      const distance = Math.sqrt(
+        Math.pow(rgb1.r - rgb2.r, 2) +
+        Math.pow(rgb1.g - rgb2.g, 2) +
+        Math.pow(rgb1.b - rgb2.b, 2)
+      );
+      
+      // 最大距离是 sqrt(255^2 * 3) ≈ 441.67
+      // 返回相似度（0-1，1表示完全相同）
+      return 1 - (distance / 441.67);
+    };
+
+    // 将CSS颜色转换为RGB对象
+    const getRGB = (color) => {
+      const ctx = document.createElement('canvas').getContext('2d');
+      ctx.fillStyle = color;
+      const computed = ctx.fillStyle;
+      
+      // 处理 rgba 格式
+      const match = computed.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/);
+      if (match) {
+        return {
+          r: parseInt(match[1]),
+          g: parseInt(match[2]),
+          b: parseInt(match[3])
+        };
+      }
+      
+      return null;
+    };
+
+    // 检测导航栏背后是否是图片背景
+    const isOverImage = () => {
+      // 检查页面中是否存在parallax-bg元素（背景图片）
+      const parallaxBg = document.querySelector('.parallax-bg');
+      if (!parallaxBg) {
+        console.log('isOverImage: 没有找到parallax-bg元素');
+        return false;
+      }
+      
+      // 获取背景图的位置和高度
+      const bgRect = parallaxBg.getBoundingClientRect();
+      
+      // 获取导航栏容器的位置
+      const containerRect = container.getBoundingClientRect();
+      
+      // 改进逻辑：检查导航栏是否在可见的背景区域内
+      // 如果背景的bottom超过导航栏的top，且背景的top小于导航栏的bottom，则说明重叠
+      const isOver = !(bgRect.bottom < containerRect.top || bgRect.top > containerRect.bottom);
+      
+      console.log('isOverImage详细信息:', {
+        bgTop: bgRect.top,
+        bgBottom: bgRect.bottom,
+        containerTop: containerRect.top,
+        containerBottom: containerRect.bottom,
+        isOver
+      });
+      
+      return isOver;
+    };
+
     // 更新按钮字体颜色
     const updateButtonTextColors = (activeButton) => {
       const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
+      const overImage = isOverImage();
+      const currentPage = getActiveBtnTarget(); // 获取当前页面
+      const isBlogPage = currentPage === 'blog'; // 只有blog页面用纯色
+      
+      console.log('updateButtonTextColors:', {
+        isDarkMode,
+        overImage,
+        currentPage,
+        isBlogPage,
+        activeButtonTarget: activeButton?.getAttribute('data-target')
+      });
       
       buttons.forEach((btn) => {
         if (btn === activeButton) {
-          // 活跃按钮：根据主题使用相反颜色
+          // 活跃按钮（在滑块上）：固定用纯白或纯黑
           if (isDarkMode) {
             btn.style.color = 'rgba(255, 255, 255, 0.95)'; // 深色模式下用白色文字
           } else {
             btn.style.color = 'rgba(20, 20, 30, 0.95)'; // 浅色模式下用黑色文字
           }
         } else {
-          // 非活跃按钮：纯黑或纯白
-          if (isDarkMode) {
-            btn.style.color = '#000000'; // 深色模式下用纯黑
+          // 非活跃按钮：只有blog页面才根据是否在图片上选择颜色，其他页面一律用灰色
+          if (isBlogPage && overImage) {
+            // Blog页面且在图片上：用纯黑或纯白，对比度更好
+            if (isDarkMode) {
+              btn.style.color = '#000000'; // 深色模式用纯黑
+            } else {
+              btn.style.color = '#ffffff'; // 浅色模式用纯白
+            }
+            console.log(`按钮 ${btn.getAttribute('data-target')} 设置为纯色`);
           } else {
-            btn.style.color = '#ffffff'; // 浅色模式下用纯白
+            // 其他所有情况：用灰色
+            btn.style.color = '#808080';
+            console.log(`按钮 ${btn.getAttribute('data-target')} 设置为灰色`);
           }
         }
       });
@@ -122,14 +229,6 @@
     };
 
     const navigate = (target) => {
-      // 在导航前，如果离开Photos页面，恢复之前的主题
-      const currentPath = window.location.pathname;
-      if (currentPath.includes('/photos') && target !== 'photos') {
-        const themeToRestore = localStorage.getItem('previousThemeBeforePhotos') || 'dark';
-        document.documentElement.setAttribute('data-theme', themeToRestore);
-        localStorage.setItem('theme', themeToRestore);
-      }
-      
       // 添加淡出效果
       container.classList.add('fade-out');
       
@@ -184,6 +283,7 @@
 
       // 鼠标悬停吸附效果 - 添加水珠效果
       button.addEventListener('mouseenter', () => {
+        hoveredButton = button; // 记录悬停的按钮
         // 清除之前的返回计时器
         if (returnToPageSliderTimer) {
           clearTimeout(returnToPageSliderTimer);
@@ -194,12 +294,14 @@
 
       // 鼠标离开时的留恋效果
       button.addEventListener('mouseleave', () => {
+        hoveredButton = null; // 清除悬停记录
         sliderLeaveEffect();
       });
     });
 
     // 容器整体离开时
     container.addEventListener('mouseleave', () => {
+      hoveredButton = null; // 清除悬停记录
       slider.style.transform = 'translateY(0)';
       
       // 清除之前的计时器
@@ -235,6 +337,48 @@
       attributeFilter: ['data-theme']
     });
 
+    // 监听滚动，更新按钮文字颜色（因为可能从图片区域滚动到纯色区域）
+    window.addEventListener('scroll', () => {
+      const currentTarget = getActiveBtnTarget();
+      const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
+      const overImage = isOverImage();
+      const isBlogPage = currentTarget === 'blog';
+      
+      buttons.forEach((btn) => {
+        if (btn === hoveredButton) {
+          // 如果按钮被悬停，不要改变它的颜色
+          return;
+        }
+        
+        const activeButton = buttons.find(b => b.getAttribute('data-target') === currentTarget);
+        const sliderIsOnCurrentButton = sliderCurrentButton === activeButton;
+        
+        if (btn === activeButton) {
+          // 活跃按钮：只有滑块在它上面时才显示纯色，否则显示灰色
+          if (sliderIsOnCurrentButton) {
+            if (isDarkMode) {
+              btn.style.color = 'rgba(255, 255, 255, 0.95)';
+            } else {
+              btn.style.color = 'rgba(20, 20, 30, 0.95)';
+            }
+          } else {
+            btn.style.color = '#808080';
+          }
+        } else {
+          // 非活跃非悬停按钮：只有blog页面且在图片上时才用纯色，其他情况用灰色
+          if (isBlogPage && overImage) {
+            if (isDarkMode) {
+              btn.style.color = '#000000';
+            } else {
+              btn.style.color = '#ffffff';
+            }
+          } else {
+            btn.style.color = '#808080';
+          }
+        }
+      });
+    }, { passive: true });
+
     // 初始化活跃按钮和滑块
     const currentTarget = getActiveBtnTarget();
     
@@ -243,13 +387,40 @@
       const buttonToUpdate = buttons.find(btn => btn.getAttribute('data-target') === currentTarget);
       if (buttonToUpdate) {
         buttonToUpdate.classList.add('active');
+        
+        // 暂时禁用滑块的过渡效果，避免初始化时的跳跃
+        slider.style.transition = 'none';
+        
         updateSlider(buttonToUpdate);
-        updateButtonTextColors(buttonToUpdate);
+        
+        // 强制重排后恢复过渡
+        void slider.offsetHeight; // 触发reflow
+        slider.style.transition = ''; // 恢复到CSS定义的样式
       }
     };
     
-    // 延迟 200ms 确保元素完全渲染
-    setTimeout(initializeSlider, 200);
+    // 延迟 50ms 初始化滑块位置，不更新颜色
+    setTimeout(initializeSlider, 50);
+    
+    // 使用 requestAnimationFrame 持续检查，直到能正确识别到图片
+    const updateColorWhenReady = () => {
+      const buttonToUpdate = buttons.find(btn => btn.getAttribute('data-target') === currentTarget);
+      if (buttonToUpdate) {
+        const overImage = isOverImage();
+        // 当能正确识别到图片时，或者已经等待足够长的时间时，更新颜色并停止检查
+        if (overImage) {
+          updateButtonTextColors(buttonToUpdate);
+        } else {
+          // 继续等待
+          requestAnimationFrame(updateColorWhenReady);
+        }
+      }
+    };
+    
+    // 延迟 100ms 开始检查，确保初始化完成
+    setTimeout(() => {
+      requestAnimationFrame(updateColorWhenReady);
+    }, 100);
   };
 
   // 在脚本加载完立即尝试初始化
@@ -263,8 +434,9 @@
 <style>
   .nav-toggle-container {
     position: fixed;
+    top: auto;
     bottom: 40px;
-    left: 50%;
+    left: 50vw;
     transform: translateX(-50%);
     z-index: 100;
     display: inline-flex;
@@ -274,9 +446,11 @@
     background: linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.02));
     backdrop-filter: blur(20px) saturate(180%);
     -webkit-backdrop-filter: blur(20px) saturate(180%);
-    animation: fadeIn 1.5s ease-out 0.2s both;
+    animation: fadeIn 1.5s ease-out 0.2s forwards;
     transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
     box-sizing: border-box;
+    will-change: transform;
+    contain: layout style paint;
   }
 
   .nav-toggle-container:hover {
