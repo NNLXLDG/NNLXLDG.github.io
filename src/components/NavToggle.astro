@@ -148,7 +148,6 @@
       // 检查页面中是否存在parallax-bg元素（背景图片）
       const parallaxBg = document.querySelector('.parallax-bg');
       if (!parallaxBg) {
-        console.log('isOverImage: 没有找到parallax-bg元素');
         return false;
       }
       
@@ -162,14 +161,6 @@
       // 如果背景的bottom超过导航栏的top，且背景的top小于导航栏的bottom，则说明重叠
       const isOver = !(bgRect.bottom < containerRect.top || bgRect.top > containerRect.bottom);
       
-      console.log('isOverImage详细信息:', {
-        bgTop: bgRect.top,
-        bgBottom: bgRect.bottom,
-        containerTop: containerRect.top,
-        containerBottom: containerRect.bottom,
-        isOver
-      });
-      
       return isOver;
     };
 
@@ -179,14 +170,6 @@
       const overImage = isOverImage();
       const currentPage = getActiveBtnTarget(); // 获取当前页面
       const isBlogPage = currentPage === 'blog'; // 只有blog页面用纯色
-      
-      console.log('updateButtonTextColors:', {
-        isDarkMode,
-        overImage,
-        currentPage,
-        isBlogPage,
-        activeButtonTarget: activeButton?.getAttribute('data-target')
-      });
       
       buttons.forEach((btn) => {
         if (btn === activeButton) {
@@ -205,11 +188,9 @@
             } else {
               btn.style.color = '#ffffff'; // 浅色模式用纯白
             }
-            console.log(`按钮 ${btn.getAttribute('data-target')} 设置为纯色`);
           } else {
             // 其他所有情况：用灰色
             btn.style.color = '#808080';
-            console.log(`按钮 ${btn.getAttribute('data-target')} 设置为灰色`);
           }
         }
       });
