@@ -27,25 +27,34 @@ function formatCategoryDisplay(category: string): string {
 function readNotesFromFS() {
   const notes: any[] = [];
   
+  // 如果目录不存在，直接返回空数组
+  if (!fs.existsSync(notesDir)) {
+    return notes;
+  }
+  
   const walkDir = (dir: string, relative: string = '') => {
-    const files = fs.readdirSync(dir);
-    files.forEach(file => {
-      const fullPath = path.join(dir, file);
-      const relPath = relative ? `${relative}/${file}` : file;
-      
-      if (fs.statSync(fullPath).isDirectory()) {
-        if (file !== 'assets') {
-          walkDir(fullPath, relPath);
+    try {
+      const files = fs.readdirSync(dir);
+      files.forEach(file => {
+        const fullPath = path.join(dir, file);
+        const relPath = relative ? `${relative}/${file}` : file;
+        
+        if (fs.statSync(fullPath).isDirectory()) {
+          if (file !== 'assets') {
+            walkDir(fullPath, relPath);
+          }
+        } else if (file.endsWith('.md')) {
+          const body = fs.readFileSync(fullPath, 'utf-8');
+          notes.push({
+            id: relPath,
+            body: body,
+            filePath: fullPath
+          });
         }
-      } else if (file.endsWith('.md')) {
-        const body = fs.readFileSync(fullPath, 'utf-8');
-        notes.push({
-          id: relPath,
-          body: body,
-          filePath: fullPath
-        });
-      }
-    });
+      });
+    } catch (error) {
+      console.error(`Error reading directory ${dir}:`, error);
+    }
   };
   
   walkDir(notesDir);
