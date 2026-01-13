@@ -5,7 +5,7 @@
   --muted:rgba(255,255,255,.62);
   --stroke:rgba(255,255,255,.14);
   --shadow:rgba(0,0,0,.38);
-  --accent:#6366f1;
+  --accent:#ffffff;
   --card-bg:rgba(255,255,255,.05);
   --border:rgba(255,255,255,.1);
   color-scheme: dark;
@@ -18,7 +18,7 @@ html[data-theme="light"] {
   --muted:rgba(60,60,80,.68);
   --stroke:rgba(0,0,0,.08);
   --shadow:rgba(0,0,0,.12);
-  --accent:#4f46e5;
+  --accent:#000000;
   --card-bg:rgba(0,0,0,.02);
   --border:rgba(0,0,0,.1);
   color-scheme: light;
@@ -233,13 +233,13 @@ html[data-theme="light"] .nav a:hover {
 
 .category-btn:hover {
   border-color: var(--accent);
-  background: rgba(99, 102, 241, 0.1);
+  background: rgba(0, 0, 0, 0.1);
 }
 
 .category-btn.active {
   background: var(--accent);
   border-color: var(--accent);
-  color: white;
+  color: var(--bg);
 }
 
 .notes-list {
@@ -271,7 +271,7 @@ html[data-theme="light"] .nav a:hover {
 }
 
 .note-item-clickable:hover {
-  background: rgba(99, 102, 241, 0.08);
+  background: rgba(0, 0, 0, 0.08);
   border-color: var(--accent);
   transform: translateX(4px);
 }
@@ -288,13 +288,12 @@ html[data-theme="light"] .nav a:hover {
 .note-detail-view {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(4px);
+  background: var(--bg);
   z-index: 200;
   display: none;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
+  flex-direction: column;
+  padding: 40px 20px;
+  overflow-y: auto;
 }
 
 .note-detail-view.active {
@@ -302,15 +301,16 @@ html[data-theme="light"] .nav a:hover {
 }
 
 .note-detail-content {
-  background: var(--bg);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 40px;
-  max-width: 800px;
-  max-height: 90vh;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  padding: 0;
+  max-width: 900px;
+  max-height: none;
   overflow-y: auto;
   position: relative;
-  animation: slideUp 0.3s ease;
+  animation: none;
+  margin: 0 auto;
 }
 
 @keyframes slideUp {
@@ -325,17 +325,18 @@ html[data-theme="light"] .nav a:hover {
 }
 
 .note-detail-close {
-  position: absolute;
+  position: fixed;
   top: 20px;
   right: 20px;
   background: none;
   border: none;
-  font-size: 24px;
+  font-size: 28px;
   cursor: pointer;
-  color: var(--muted);
+  color: var(--text);
   transition: color 0.3s ease;
   z-index: 201;
   padding: 8px;
+  font-weight: bold;
 }
 
 .note-detail-close:hover {
@@ -387,7 +388,7 @@ html[data-theme="light"] .nav a:hover {
 }
 
 .note-detail-content code {
-  background: rgba(99, 102, 241, 0.15);
+  background: var(--card-bg);
   padding: 2px 6px;
   border-radius: 4px;
   font-family: 'Monaco', 'Menlo', monospace;
@@ -436,6 +437,16 @@ html[data-theme="light"] .nav a:hover {
   border-radius: 8px;
   margin: 16px 0;
   border: 1px solid var(--border);
+}
+
+.note-image {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  margin: 16px 0;
+  border: 1px solid var(--border);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transition: transform 0.3s ease;
 }
 
 .note-detail-content table {

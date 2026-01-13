@@ -1,16 +1,20 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import NavToggle from "../../components/NavToggle.astro";
-import { getCollection } from 'astro:content';
+import { marked } from 'marked';
 import fs from 'fs';
 import path from 'path';
+import { fileURLToPath } from 'url';
 
-// 辅助函数：规范化分类名（统一为小写，替换空格为连字符）
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const notesDir = path.join(__dirname, '../../..', 'public', 'content');
+
+// 辅助函数：规范化分类名
 function normalizeCategory(category: string): string {
   return category.toLowerCase().trim().replace(/\s+/g, '-');
 }
 
-// 辅助函数：格式化显示的分类名（将连字符替换为空格，首字母大写）
+// 辅助函数：格式化显示的分类名
 function formatCategoryDisplay(category: string): string {
   return category
     .replace(/-/g, ' ')
@@ -19,70 +23,125 @@ function formatCategoryDisplay(category: string): string {
     .join(' ');
 }
 
-const notes = await getCollection('notes');
-
-// 辅助函数：从文件名提取标题（去掉 .md 扩展名）
-function getTitleFromFilename(filename: string): string {
-  // 移除 .md 扩展名
-  return filename.replace(/\.md$/, '');
+// 从文件系统读取所有笔记
+function readNotesFromFS() {
+  const notes: any[] = [];
+  
+  const walkDir = (dir: string, relative: string = '') => {
+    const files = fs.readdirSync(dir);
+    files.forEach(file => {
+      const fullPath = path.join(dir, file);
+      const relPath = relative ? `${relative}/${file}` : file;
+      
+      if (fs.statSync(fullPath).isDirectory()) {
+        if (file !== 'assets') {
+          walkDir(fullPath, relPath);
+        }
+      } else if (file.endsWith('.md')) {
+        const body = fs.readFileSync(fullPath, 'utf-8');
+        notes.push({
+          id: relPath,
+          body: body,
+          filePath: fullPath
+        });
+      }
+    });
+  };
+  
+  walkDir(notesDir);
+  return notes;
 }
 
-// 辅助函数：从文件路径提取类别和标题
+const notes = readNotesFromFS();
+
+// 辅助函数：获取文件修改时间
+function getFileModTime(filePath: string): number {
+  try {
+    return fs.statSync(filePath).mtimeMs || 0;
+  } catch {
+    return 0;
+  }
+}
+
+// 辅助函数：从笔记 ID 提取元数据
 function extractMetadata(note: any) {
-  const id = note.id; // 例如: "computer-science/C & C++/C语言学习框架.md"
-  const parts = id.split('/').filter(p => p); // 分割路径并去空
+  const id = note.id;
+  const parts = id.split('/').filter((p: string) => p);
   
-  const category = parts[0] || ''; // 第一级：分类
+  const category = parts[0] || '';
   let title = '';
   
-  // 判断结构层级
   if (parts.length >= 3) {
-    // 三级或更深：category/subfolder/filename.md
-    // title 来自文件名（最后一部分）
+    // 三级结构：category/subcategory/filename.md
     title = getTitleFromFilename(parts[parts.length - 1]);
   } else if (parts.length === 2) {
-    // 二级：category/filename.md（如 mathematics/index.md）
+    // 二级：category/filename.md
     const filename = parts[1];
     if (filename === 'index.md') {
-      // index.md 时，title 来自 category 名
       title = category;
     } else {
-      // 其他 md 文件时，来自文件名
       title = getTitleFromFilename(filename);
     }
   } else if (parts.length === 1) {
-    // 只有文件名（不应该出现）
     title = getTitleFromFilename(parts[0]);
   }
   
-  // 格式化标题：横线改空格，首字母大写
   title = title.replace(/-/g, ' ').split(' ').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
-  
-  // 规范化分类名（统一为小写）
   const normalizedCategory = normalizeCategory(category);
   
   return { category: normalizedCategory, title };
 }
 
-// 获取文件的修改时间
-function getFileModTime(id: string): number {
-  try {
-    const filePath = path.join(process.cwd(), 'src/content/notes', id);
-    const stats = fs.statSync(filePath);
-    return stats.mtimeMs;
-  } catch (e) {
-    return 0;
-  }
+// 从文件名提取标题
+function getTitleFromFilename(filename: string): string {
+  return filename.replace(/\.md$/, '');
 }
 
+// 处理并编译所有笔记内容
 const notesWithMeta = notes.map(note => {
   const metadata = extractMetadata(note);
-  const modTime = getFileModTime(note.id);
+  const modTime = fs.statSync(note.filePath).mtimeMs || 0;
+  
+  // 使用 marked 将 markdown 编译为 HTML
+  let htmlContent = marked(note.body);
+  
+  // 处理图片路径：将占位符转换为正确的访问路径
+  const noteDir = note.id.substring(0, note.id.lastIndexOf('/'));
+  
+  // 替换 __IMGPLACEHOLDER__filename__IMGPLACEHOLDER__ 为正确的路径
+  htmlContent = htmlContent.replace(/__IMGPLACEHOLDER__(.+?)__IMGPLACEHOLDER__/g, 
+    (match, imgName) => {
+      // 解码 URL 编码的文件名
+      let decodedName = decodeURIComponent(imgName);
+      // 移除任何前缀的 assets/ 或其他路径
+      decodedName = decodedName.split('/').pop();
+      return `/content/${noteDir}/assets/${decodedName}`;
+    }
+  );
+  
+  // 处理 markdown 直接生成的相对路径图片引用
+  // 匹配 src="xxxx" 或 src='xxxx' 中不包含 / 的相对路径（既不是 http(s):// 也不是 / 开头）
+  htmlContent = htmlContent.replace(/src=["'](?!(?:https?:|\/))([^"']+)["']/g, 
+    (match, imgName) => {
+      // 仅处理看起来像文件名的情况（包含扩展名）
+      if (/\.\w+$/.test(imgName)) {
+        // 解码 URL 编码的文件名
+        let decodedName = decodeURIComponent(imgName);
+        // 移除任何前缀的 assets/
+        decodedName = decodedName.split('/').pop();
+        // 返回正确的路径 - 首先尝试 assets 文件夹，否则使用同级目录
+        return `src="/content/${noteDir}/${decodedName}"`;
+      }
+      return match;
+    }
+  );
+  
   return {
     ...note,
     category: metadata.category,
     title: metadata.title,
-    modTime: modTime
+    modTime: modTime,
+    htmlContent: htmlContent
   };
 });
 
@@ -160,11 +219,20 @@ sortedNotes.forEach(note => {
         <button class="note-detail-close" id="note-detail-close">✕</button>
         <div class="note-detail-content"></div>
       </div>
+
+      <!-- 隐藏的笔记内容容器 -->
+      <div id="note-html-storage" style="display: none;">
+        {sortedNotes.map((note) => (
+          <div data-note-id={note.id} data-note-title={note.title}>
+            <div set:html={note.htmlContent} />
+          </div>
+        ))}
+      </div>
     </div>
   </section>
 </BaseLayout>
 
-<script define:vars={{ notesByCategory: JSON.stringify(notesByCategory), sortedNotes: JSON.stringify(sortedNotes.map(n => ({ id: n.id, category: n.category, title: n.title, body: n.body }))) }}>
+<script define:vars={{ notesByCategory: JSON.stringify(notesByCategory), sortedNotes: JSON.stringify(sortedNotes.map(n => ({ id: n.id, category: n.category, title: n.title }))) }}>
   // 背景图片设置和视差滚动效果
   const parallaxBg = document.querySelector('.parallax-bg');
   if (parallaxBg) {
@@ -228,17 +296,17 @@ sortedNotes.forEach(note => {
   const noteDetailView = document.getElementById('note-detail-view');
   const noteDetailClose = document.getElementById('note-detail-close');
   const noteDetailContent = noteDetailView.querySelector('.note-detail-content');
-  
-  // 解析并显示笔记
-  const notesData = JSON.parse(sortedNotes);
+  const noteHtmlStorage = document.getElementById('note-html-storage');
   
   document.querySelectorAll('.note-item-clickable').forEach(item => {
     item.addEventListener('click', function() {
       const noteId = this.dataset.noteId;
-      const note = notesData.find(n => n.id === noteId);
+      const noteContainer = noteHtmlStorage.querySelector(`[data-note-id="${noteId}"]`);
       
-      if (note) {
-        noteDetailContent.innerHTML = `<h2>${note.title}</h2>${note.body}`;
+      if (noteContainer) {
+        const noteTitle = noteContainer.getAttribute('data-note-title');
+        const noteHtml = noteContainer.innerHTML;
+        noteDetailContent.innerHTML = `<h2>${noteTitle}</h2>${noteHtml}`;
         noteDetailView.classList.add('active');
         document.body.style.overflow = 'hidden';
       }

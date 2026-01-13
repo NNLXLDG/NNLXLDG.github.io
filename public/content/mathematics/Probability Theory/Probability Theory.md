@@ -23,7 +23,7 @@
 样本空间$\Omega$的任一子集称为**随机事件**（random event），通常用大写字母A、B、C等表示。不包括任一基本事件的事件称为**不可能事件**,用$\emptyset$表示；包含样本空间中所有基本事件的事件称为**必然事件**，用$\Omega$表示。
 
 ### 概念辨析
-![alt text](./image.png)
+<img src="__IMGPLACEHOLDER__image.png__IMGPLACEHOLDER__" alt="alt text" />
 
 
 
@@ -31,11 +31,11 @@
 
 ### 2.1 事件的运算
 设 A，B 为两个随机事件，则事件A与事件B 同时发生的事件，称为事件 A,B 的**积事件**，记为 $AB$ 或 $A\cap B$ ，如下图所示。
-![alt text](./image-1.png)
+<img src="__IMGPLACEHOLDER__image-1.png__IMGPLACEHOLDER__" alt="alt text" />
 
 事件A或事件B发生的事件（即事件A与事件B至少有一个事件发生的事件），称为事件 A,B 的**和事件**，记为 $A+B$ 或 $A\cup B$ ，如下图所示。
 
-![alt text](./image-2.png)
+<img src="__IMGPLACEHOLDER__image-2.png__IMGPLACEHOLDER__" alt="alt text" />
 
 事件A发生而事件B不发生的事件，称为事件 A,B 的**差事件**，记为 $A-B$ ，事件A不发生的事件，称为事件A的**补事件**，记为 $\bar{A}$。
 
@@ -44,10 +44,10 @@
 设 A,B 为两个随机事件，若事件A发生时，事件B一定发生，则称A包含于B ，记为 $A\subset B $ 。若有 $ A\subset B$,$B\subset A$ 称两事件相等，记为 A = B 。
 
 若事件 A 与 B 不能同时发生，称事件 A,B 不相容或互斥，如下图所示。
-![alt text](./image-3.png)
+<img src="__IMGPLACEHOLDER__image-3.png__IMGPLACEHOLDER__" alt="alt text" />
 
 若事件 A 与 B 不能同时发生，但至少会有一个发生，称事件 A,B 为对立事件，如下图所示。
-![alt text](./image-4.png)
+<img src="__IMGPLACEHOLDER__image-4.png__IMGPLACEHOLDER__" alt="alt text" />
 
 
 ### 2.3 事件运算的性质

@@ -192,7 +192,7 @@
 
 **最小二乘和均方误差之间的关系**
 
-![alt text](assets/image.png)
+<img src="__IMGPLACEHOLDER__image.png__IMGPLACEHOLDER__" alt="alt text" />
 
 
 #### 2.1.4什么是梯度下降？SGD的推导？
@@ -213,11 +213,11 @@
 6. 合页损失
 一种二分类损失函数，SVM的损失函数本质： Hinge Loss + L2 正则化   
 合页损失的公式如下：
-![alt text](assets/image-1.png)
+<img src="__IMGPLACEHOLDER__image-1.png__IMGPLACEHOLDER__" alt="alt text" />
 
 
 #### 2.1.7 有哪些评估回归模型的指标？
-![alt text](assets/image-2.png)
+<img src="__IMGPLACEHOLDER__image-2.png__IMGPLACEHOLDER__" alt="alt text" />
 
 
 #### 2.1.8 什么是正规方程？
@@ -277,10 +277,10 @@ LR模型属于线性模型，线性模型不能很好处理非线性特征，特
 
 
 #### 2.2.3 LR和线性回归的关系
-![alt text](assets/image-3.png)
+<img src="__IMGPLACEHOLDER__image-3.png__IMGPLACEHOLDER__" alt="alt text" />
 
 **共同点**：
-![alt text](assets/image-4.png)
+<img src="__IMGPLACEHOLDER__image-4.png__IMGPLACEHOLDER__" alt="alt text" />
 
 
 
@@ -296,16 +296,16 @@ LR模型属于线性模型，线性模型不能很好处理非线性特征，特
 
 ### 2.3 Lasso
 
-![alt text](assets/image-5.png)
+<img src="__IMGPLACEHOLDER__image-5.png__IMGPLACEHOLDER__" alt="alt text" />
 
 ### 2.4 Ridge
 
-![alt text](assets/image-6.png)
+<img src="__IMGPLACEHOLDER__image-6.png__IMGPLACEHOLDER__" alt="alt text" />
 
 
 
 ### 2.5 对比
-![alt text](assets/image-7.png)
+<img src="__IMGPLACEHOLDER__image-7.png__IMGPLACEHOLDER__" alt="alt text" />
 
 
 
@@ -325,7 +325,7 @@ LR模型属于线性模型，线性模型不能很好处理非线性特征，特
 3. 训练模型过度导致模型非常复杂
 
 ### 3.2 如何避免过拟合问题？
-![alt text](assets/image-8.png)
+<img src="__IMGPLACEHOLDER__image-8.png__IMGPLACEHOLDER__" alt="alt text" />
 
 
 
@@ -376,7 +376,7 @@ k越大，不一定效果越好，而且越大的k会加大训练时间；
 ### 3.11 区别
 网格搜索（Grid Search）和随机搜索（Random Search）都是超参数调优 的常用方法，用于在机器学习模型中寻找最优的超参数组合。虽然它们的目标相同，但在实现方式、效率、适用场景等方面有明显区别。
 
-![alt text](assets/image-9.png)
+<img src="__IMGPLACEHOLDER__image-9.png__IMGPLACEHOLDER__" alt="alt text" />
 
 
 ## 4.分类
@@ -393,7 +393,7 @@ k越大，不一定效果越好，而且越大的k会加大训练时间；
 
 ### 4.2 P-R曲线
 
-![alt text](assets/image-11.png)
+<img src="__IMGPLACEHOLDER__image-11.png__IMGPLACEHOLDER__" alt="alt text" />
 
 
 横轴为**召回率(查全率)**，纵轴为**精准率(查准率)**;  
@@ -403,7 +403,7 @@ k越大，不一定效果越好，而且越大的k会加大训练时间；
 
 
 ### 4.3 F1-Score
-![alt text](assets/image-12.png)
+<img src="__IMGPLACEHOLDER__image-12.png__IMGPLACEHOLDER__" alt="alt text" />
 准确率和召回率的权衡: 只有在召回率Recall和精确率Precision都高的情况下，F1 score才会很高，比BEP更为常用。   
 
 
@@ -1289,7 +1289,7 @@ Bagging 的扩展变体，引入**双重随机性**进一步降方差：
 ---
 
 ### **11.5 核主成分分析（KPCA）**  
-![alt text](assets/image-17.png)
+<img src="__IMGPLACEHOLDER__image-17.png__IMGPLACEHOLDER__" alt="alt text" />
 1. **PCA核心思想**  
    - 将数据投影到方差最大的正交方向（主成分）。  
    - **协方差矩阵**：$\Sigma = \frac{1}{M} \sum \mathbf{x}_i \mathbf{x}_i^T$。  
@@ -1399,7 +1399,7 @@ RNN的基本单元是一个循环单元（Recurrent Unit），它接收一个输
 ---
 
 ### **12.4 长短期记忆网络 (LSTM)**
-![alt text](assets/image-20.png)
+<img src="__IMGPLACEHOLDER__image-20.png__IMGPLACEHOLDER__" alt="alt text" />
 
 #### **12.4.1 解决RNN核心问题**
    - **长期依赖失效**：普通RNN梯度消失导致无法记忆长序列  
