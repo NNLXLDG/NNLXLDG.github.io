@@ -19,8 +19,8 @@ const blog = defineCollection({
 const notes = defineCollection({
 	loader: glob({ base: './src/content/notes', pattern: '**/*.md' }),
 	schema: z.object({
-		title: z.string(),
-		category: z.string(),
+		title: z.string().optional(),
+		category: z.string().optional(),
 		order: z.number().optional(),
 	}),
 });
