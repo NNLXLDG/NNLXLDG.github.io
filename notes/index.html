@@ -1,0 +1,526 @@
+<!DOCTYPE html><html lang="zh-CN" data-astro-cid-37fxchfa> <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Notes</title><link rel="stylesheet" href="/_astro/about.DDHIi2kr.css">
+<style>.nav-toggle-container[data-astro-cid-2kdq35iv]{position:fixed;top:auto;bottom:40px;left:50vw;transform:translate(-50%);z-index:100;display:inline-flex;gap:0;padding:6px;border-radius:999px;background:linear-gradient(180deg,#ffffff14,#ffffff05);backdrop-filter:blur(20px) saturate(180%);-webkit-backdrop-filter:blur(20px) saturate(180%);animation:fadeIn 1.5s ease-out .2s forwards;transition:all .4s cubic-bezier(.34,1.56,.64,1);box-sizing:border-box;will-change:transform;contain:layout style paint}.nav-toggle-container[data-astro-cid-2kdq35iv]:hover{transform:translate(-50%) translateY(-4px) scale(1.02)}@keyframes fadeIn{0%{opacity:0;transform:translate(-50%) translateY(20px)}to{opacity:1;transform:translate(-50%) translateY(0)}}@keyframes fadeOut{0%{opacity:1;transform:translate(-50%) translateY(0)}to{opacity:0;transform:translate(-50%) translateY(20px)}}.nav-toggle-container[data-astro-cid-2kdq35iv].fade-out{animation:fadeOut 1.5s ease-out forwards}html[data-theme=light] .nav-toggle-container[data-astro-cid-2kdq35iv]{background:linear-gradient(180deg,#6478c814,#6478c805);border-color:#6478c826;box-shadow:0 8px 24px #00000014,inset 0 1px #6478c826}.nav-toggle-btn[data-astro-cid-2kdq35iv]{position:relative;z-index:2;padding:.6rem 1rem;border:none;background:transparent;color:var(--muted);cursor:pointer;border-radius:999px;font-size:inherit;font-weight:500;transition:color .3s ease,text-shadow .3s ease;white-space:nowrap}.nav-toggle-btn[data-astro-cid-2kdq35iv]:hover{text-shadow:0 0 8px rgba(255,255,255,.3)}.nav-toggle-btn[data-astro-cid-2kdq35iv]:hover~.toggle-slider[data-astro-cid-2kdq35iv]{transform:scale(1.05)}.nav-toggle-btn[data-astro-cid-2kdq35iv].active{color:var(--text)}html[data-theme=light] .nav-toggle-btn[data-astro-cid-2kdq35iv].active{color:#14141ef2;font-weight:600}.toggle-slider[data-astro-cid-2kdq35iv]{position:absolute;top:6px;left:6px;background:linear-gradient(135deg,#ffffff1f,#ffffff0a);border:1px solid rgba(255,255,255,.12);border-radius:999px;backdrop-filter:blur(8px) saturate(150%);-webkit-backdrop-filter:blur(8px) saturate(150%);box-shadow:0 4px 16px #ffffff0d,0 8px 24px #0003,inset 0 1px 1px #fff3,inset 0 -1px 1px #00000014;z-index:1;transition:all .4s cubic-bezier(.34,1.56,.64,1),transform .3s cubic-bezier(.34,1.56,.64,1);pointer-events:none}.toggle-slider[data-astro-cid-2kdq35iv]:before{content:"";position:absolute;inset:-40%;background:radial-gradient(circle at 30% 30%,rgba(255,255,255,.15),transparent 50%);border-radius:50%;filter:blur(12px);opacity:.6;animation:liquidPulse 3s ease-in-out infinite}@keyframes liquidPulse{0%,to{transform:scale(.9);opacity:.5}50%{transform:scale(1.1);opacity:.8}}@media(max-width:640px){.nav-toggle-container[data-astro-cid-2kdq35iv]{gap:0;padding:4px}.nav-toggle-btn[data-astro-cid-2kdq35iv]{padding:.5rem .8rem;font-size:.95em}}
+</style>
+<link rel="stylesheet" href="/_astro/index.CpGYlhrr.css"></head> <body data-astro-cid-37fxchfa> <div class="container" data-astro-cid-37fxchfa> <div class="nav" data-astro-cid-37fxchfa> <a class="brand" href="/" data-astro-cid-37fxchfa>Xie's Island</a> <div class="row nav-right" data-astro-cid-37fxchfa> <a href="/about" data-astro-cid-37fxchfa>About me</a> <button id="theme-switcher" class="theme-btn" aria-label="Toggle theme" data-astro-cid-dz5h74bc> <svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" data-astro-cid-dz5h74bc> <circle cx="12" cy="12" r="5" data-astro-cid-dz5h74bc></circle> <line x1="12" y1="1" x2="12" y2="3" data-astro-cid-dz5h74bc></line> <line x1="12" y1="21" x2="12" y2="23" data-astro-cid-dz5h74bc></line> <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" data-astro-cid-dz5h74bc></line> <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" data-astro-cid-dz5h74bc></line> <line x1="1" y1="12" x2="3" y2="12" data-astro-cid-dz5h74bc></line> <line x1="21" y1="12" x2="23" y2="12" data-astro-cid-dz5h74bc></line> <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" data-astro-cid-dz5h74bc></line> <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" data-astro-cid-dz5h74bc></line> </svg> <svg class="moon-icon" viewBox="0 0 24 24" fill="currentColor" data-astro-cid-dz5h74bc> <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" data-astro-cid-dz5h74bc></path> </svg> </button> <script type="module">const a=()=>{const t=document.getElementById("theme-switcher");if(!t)return;const e=document.documentElement,c=window.matchMedia("(prefers-color-scheme: dark)").matches,r=localStorage.getItem("theme")||(c?"dark":"light");e.setAttribute("data-theme",r);const n=()=>{const m=e.getAttribute("data-theme")==="dark"?"light":"dark";e.setAttribute("data-theme",m),localStorage.setItem("theme",m)};t.addEventListener("click",n)};a();</script>  </div> </div>   <div class="parallax-bg" id="parallax-bg" data-astro-cid-mejek24l></div>  <section class="hero" data-astro-cid-mejek24l> <h1 data-astro-cid-mejek24l>Notes</h1> </section>  <div class="nav-toggle-container" data-astro-cid-2kdq35iv> <button class="nav-toggle-btn" data-target="blog" data-astro-cid-2kdq35iv> <span data-astro-cid-2kdq35iv>📝 Blog</span> </button> <button class="nav-toggle-btn" data-target="notes" data-astro-cid-2kdq35iv> <span data-astro-cid-2kdq35iv>📋 Notes</span> </button> <button class="nav-toggle-btn" data-target="photos" data-astro-cid-2kdq35iv> <span data-astro-cid-2kdq35iv>📷 Photos</span> </button> <button class="nav-toggle-btn" data-target="mcgames" data-astro-cid-2kdq35iv> <span data-astro-cid-2kdq35iv>🎮 MC Games</span> </button> <div class="toggle-slider" data-astro-cid-2kdq35iv></div> </div> <script>
+  const initNavToggle = () => {
+    const container = document.querySelector('.nav-toggle-container');
+    const buttonsNodeList = document.querySelectorAll('.nav-toggle-btn');
+    const buttons = Array.from(buttonsNodeList); // 转换为数组
+    const slider = document.querySelector('.toggle-slider');
+    
+    if (!container || !buttons.length || !slider) {
+      // 如果还没加载，延迟再试一次
+      setTimeout(initNavToggle, 100);
+      return;
+    }
+
+    // 追踪鼠标Y坐标变化
+    let lastMouseY = 0;
+    let mouseDirection = 0; // 1: 向下, -1: 向上
+    let returnToPageSliderTimer = null;
+    let hoveredButton = null; // 追踪当前悬停的按钮
+    let sliderCurrentButton = null; // 追踪滑块当前所在的按钮
+
+    container.addEventListener('mousemove', (e) => {
+      const currentY = e.clientY;
+      if (lastMouseY !== 0) {
+        mouseDirection = currentY > lastMouseY ? 1 : -1;
+      }
+      lastMouseY = currentY;
+    });
+
+    // 根据当前路径确定活跃按钮
+    const getActiveBtnTarget = () => {
+      const path = window.location.pathname;
+      if (path === '/') return 'blog';
+      if (path.startsWith('/notes')) return 'notes';
+      if (path.startsWith('/photos')) return 'photos';
+      if (path.startsWith('/mc')) return 'mcgames';
+      return 'blog';
+    };
+
+    const updateSlider = (button, withLiquidEffect = false) => {
+      const rect = button.getBoundingClientRect();
+      const containerRect = container.getBoundingClientRect();
+      
+      const leftPos = rect.left - containerRect.left;
+      const rightPos = leftPos + rect.width;
+      const containerWidth = containerRect.width;
+      
+      // 确保滑块不超出容器边界
+      const maxLeft = containerWidth - rect.width - 6; // 减去右侧padding
+      const finalLeft = Math.min(leftPos, maxLeft);
+      
+      slider.style.left = finalLeft + 'px';
+      slider.style.width = rect.width + 'px';
+      slider.style.height = rect.height + 'px';
+      
+      // 记录滑块当前所在的按钮
+      sliderCurrentButton = button;
+      
+      // 更新按钮字体颜色：滑块在哪个按钮上，那个按钮的字体反转
+      updateButtonTextColors(button);
+      
+      // 水珠微动效果 - 进入时抵触（反方向）
+      if (withLiquidEffect && mouseDirection !== 0) {
+        const offset = -mouseDirection * 3; // 反方向移动3px（抵触）
+        slider.style.transform = `translateY(${offset}px)`;
+        
+        // 150ms后回弹
+        setTimeout(() => {
+          slider.style.transform = 'translateY(0)';
+        }, 150);
+      }
+    };
+
+    // 计算颜色的亮度
+    const getLuminance = (color) => {
+      const rgb = getRGB(color);
+      if (!rgb) return 0;
+      
+      // 使用相对亮度公式
+      const [r, g, b] = [rgb.r, rgb.g, rgb.b].map(val => {
+        val = val / 255;
+        return val <= 0.03928 ? val / 12.92 : Math.pow((val + 0.055) / 1.055, 2.4);
+      });
+      
+      return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+    };
+
+    // 计算两个颜色的相似度（0-1，1为完全相同）
+    const getColorSimilarity = (color1, color2) => {
+      // 将颜色转换为RGB
+      const rgb1 = getRGB(color1);
+      const rgb2 = getRGB(color2);
+      
+      if (!rgb1 || !rgb2) return 0;
+      
+      // 计算欧几里得距离
+      const distance = Math.sqrt(
+        Math.pow(rgb1.r - rgb2.r, 2) +
+        Math.pow(rgb1.g - rgb2.g, 2) +
+        Math.pow(rgb1.b - rgb2.b, 2)
+      );
+      
+      // 最大距离是 sqrt(255^2 * 3) ≈ 441.67
+      // 返回相似度（0-1，1表示完全相同）
+      return 1 - (distance / 441.67);
+    };
+
+    // 将CSS颜色转换为RGB对象
+    const getRGB = (color) => {
+      const ctx = document.createElement('canvas').getContext('2d');
+      ctx.fillStyle = color;
+      const computed = ctx.fillStyle;
+      
+      // 处理 rgba 格式
+      const match = computed.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/);
+      if (match) {
+        return {
+          r: parseInt(match[1]),
+          g: parseInt(match[2]),
+          b: parseInt(match[3])
+        };
+      }
+      
+      return null;
+    };
+
+    // 检测导航栏背后是否是图片背景
+    const isOverImage = () => {
+      // 检查页面中是否存在parallax-bg元素（背景图片）
+      const parallaxBg = document.querySelector('.parallax-bg');
+      if (!parallaxBg) {
+        return false;
+      }
+      
+      // 获取背景图的位置和高度
+      const bgRect = parallaxBg.getBoundingClientRect();
+      
+      // 获取导航栏容器的位置
+      const containerRect = container.getBoundingClientRect();
+      
+      // 改进逻辑：检查导航栏是否在可见的背景区域内
+      // 如果背景的bottom超过导航栏的top，且背景的top小于导航栏的bottom，则说明重叠
+      const isOver = !(bgRect.bottom < containerRect.top || bgRect.top > containerRect.bottom);
+      
+      return isOver;
+    };
+
+    // 更新按钮字体颜色
+    const updateButtonTextColors = (activeButton) => {
+      const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
+      const overImage = isOverImage();
+      const currentPage = getActiveBtnTarget(); // 获取当前页面
+      const isBlogPage = currentPage === 'blog'; // 只有blog页面用纯色
+      
+      buttons.forEach((btn) => {
+        if (btn === activeButton) {
+          // 活跃按钮（在滑块上）：固定用纯白或纯黑
+          if (isDarkMode) {
+            btn.style.color = 'rgba(255, 255, 255, 0.95)'; // 深色模式下用白色文字
+          } else {
+            btn.style.color = 'rgba(20, 20, 30, 0.95)'; // 浅色模式下用黑色文字
+          }
+        } else {
+          // 非活跃按钮：只有blog页面才根据是否在图片上选择颜色，其他页面一律用灰色
+          if (isBlogPage && overImage) {
+            // Blog页面且在图片上：用纯黑或纯白，对比度更好
+            if (isDarkMode) {
+              btn.style.color = '#000000'; // 深色模式用纯黑
+            } else {
+              btn.style.color = '#ffffff'; // 浅色模式用纯白
+            }
+          } else {
+            // 其他所有情况：用灰色
+            btn.style.color = '#808080';
+          }
+        }
+      });
+    };
+
+    const sliderLeaveEffect = () => {
+      // 离开时留恋（顺着方向）
+      if (mouseDirection !== 0) {
+        const offset = mouseDirection * 3; // 顺着方向移动3px（留恋）
+        slider.style.transform = `translateY(${offset}px)`;
+        
+        // 200ms后回弹
+        setTimeout(() => {
+          slider.style.transform = 'translateY(0)';
+        }, 200);
+      }
+    };
+
+    const navigate = (target) => {
+      // 添加淡出效果
+      container.classList.add('fade-out');
+      
+      setTimeout(() => {
+        // 触发导航
+        let href = '/';
+        if (target === 'notes') href = '/notes';
+        else if (target === 'photos') href = '/photos';
+        else if (target === 'mcgames') href = '/mc';
+        
+        window.location.href = href;
+      }, 300);
+    };
+
+    // 返回到当前页面按钮的滑块位置
+    const returnSliderToCurrentPage = () => {
+      const currentTarget = getActiveBtnTarget();
+      const buttonToReturn = buttons.find(btn => btn.getAttribute('data-target') === currentTarget);
+      if (buttonToReturn) {
+        // 临时改变过渡效果为 ease-out（先快后慢）
+        const originalTransition = slider.style.transition;
+        slider.style.transition = 'all 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s cubic-bezier(0.16, 1, 0.3, 1)';
+        
+        updateSlider(buttonToReturn, false);
+        
+        // 动画完成后恢复原始过渡效果
+        setTimeout(() => {
+          slider.style.transition = originalTransition;
+        }, 600);
+      }
+    };
+
+    buttons.forEach((button) => {
+      button.addEventListener('click', () => {
+        const target = button.getAttribute('data-target');
+        const currentTarget = getActiveBtnTarget();
+        
+        if (target === currentTarget) return;
+
+        // 移除所有活跃状态
+        buttons.forEach(btn => btn.classList.remove('active'));
+        
+        // 添加活跃状态
+        button.classList.add('active');
+
+        // 更新滑块位置
+        updateSlider(button);
+
+        // 页面过渡效果
+        navigate(target);
+      });
+
+      // 鼠标悬停吸附效果 - 添加水珠效果
+      button.addEventListener('mouseenter', () => {
+        hoveredButton = button; // 记录悬停的按钮
+        // 清除之前的返回计时器
+        if (returnToPageSliderTimer) {
+          clearTimeout(returnToPageSliderTimer);
+          returnToPageSliderTimer = null;
+        }
+        updateSlider(button, true);
+      });
+
+      // 鼠标离开时的留恋效果
+      button.addEventListener('mouseleave', () => {
+        hoveredButton = null; // 清除悬停记录
+        sliderLeaveEffect();
+      });
+    });
+
+    // 容器整体离开时
+    container.addEventListener('mouseleave', () => {
+      hoveredButton = null; // 清除悬停记录
+      slider.style.transform = 'translateY(0)';
+      
+      // 清除之前的计时器
+      if (returnToPageSliderTimer) {
+        clearTimeout(returnToPageSliderTimer);
+      }
+      
+      // 3秒后如果鼠标还不在容器内，则返回到当前页面按钮
+      returnToPageSliderTimer = setTimeout(() => {
+        returnSliderToCurrentPage();
+      }, 3000);
+    });
+
+    // 鼠标重新进入容器时，取消返回计时器
+    container.addEventListener('mouseenter', () => {
+      if (returnToPageSliderTimer) {
+        clearTimeout(returnToPageSliderTimer);
+        returnToPageSliderTimer = null;
+      }
+    });
+
+    // 监听主题变化，更新按钮文字颜色
+    const observer = new MutationObserver(() => {
+      const currentTarget = getActiveBtnTarget();
+      const buttonToUpdate = buttons.find(btn => btn.getAttribute('data-target') === currentTarget);
+      if (buttonToUpdate) {
+        updateButtonTextColors(buttonToUpdate);
+      }
+    });
+
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['data-theme']
+    });
+
+    // 监听滚动，更新按钮文字颜色（因为可能从图片区域滚动到纯色区域）
+    window.addEventListener('scroll', () => {
+      const currentTarget = getActiveBtnTarget();
+      const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
+      const overImage = isOverImage();
+      const isBlogPage = currentTarget === 'blog';
+      
+      buttons.forEach((btn) => {
+        if (btn === hoveredButton) {
+          // 如果按钮被悬停，不要改变它的颜色
+          return;
+        }
+        
+        const activeButton = buttons.find(b => b.getAttribute('data-target') === currentTarget);
+        const sliderIsOnCurrentButton = sliderCurrentButton === activeButton;
+        
+        if (btn === activeButton) {
+          // 活跃按钮：只有滑块在它上面时才显示纯色，否则显示灰色
+          if (sliderIsOnCurrentButton) {
+            if (isDarkMode) {
+              btn.style.color = 'rgba(255, 255, 255, 0.95)';
+            } else {
+              btn.style.color = 'rgba(20, 20, 30, 0.95)';
+            }
+          } else {
+            btn.style.color = '#808080';
+          }
+        } else {
+          // 非活跃非悬停按钮：只有blog页面且在图片上时才用纯色，其他情况用灰色
+          if (isBlogPage && overImage) {
+            if (isDarkMode) {
+              btn.style.color = '#000000';
+            } else {
+              btn.style.color = '#ffffff';
+            }
+          } else {
+            btn.style.color = '#808080';
+          }
+        }
+      });
+    }, { passive: true });
+
+    // 初始化活跃按钮和滑块
+    const currentTarget = getActiveBtnTarget();
+    
+    // 延迟后找到对应的按钮并更新滑块
+    const initializeSlider = () => {
+      const buttonToUpdate = buttons.find(btn => btn.getAttribute('data-target') === currentTarget);
+      if (buttonToUpdate) {
+        buttonToUpdate.classList.add('active');
+        
+        // 暂时禁用滑块的过渡效果，避免初始化时的跳跃
+        slider.style.transition = 'none';
+        
+        updateSlider(buttonToUpdate);
+        
+        // 强制重排后恢复过渡
+        void slider.offsetHeight; // 触发reflow
+        slider.style.transition = ''; // 恢复到CSS定义的样式
+      }
+    };
+    
+    // 延迟 50ms 初始化滑块位置，不更新颜色
+    setTimeout(initializeSlider, 50);
+    
+    // 使用 requestAnimationFrame 持续检查，直到能正确识别到图片
+    const updateColorWhenReady = () => {
+      const buttonToUpdate = buttons.find(btn => btn.getAttribute('data-target') === currentTarget);
+      if (buttonToUpdate) {
+        const overImage = isOverImage();
+        // 当能正确识别到图片时，或者已经等待足够长的时间时，更新颜色并停止检查
+        if (overImage) {
+          updateButtonTextColors(buttonToUpdate);
+        } else {
+          // 继续等待
+          requestAnimationFrame(updateColorWhenReady);
+        }
+      }
+    };
+    
+    // 延迟 100ms 开始检查，确保初始化完成
+    setTimeout(() => {
+      requestAnimationFrame(updateColorWhenReady);
+    }, 100);
+  };
+
+  // 在脚本加载完立即尝试初始化
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initNavToggle);
+  } else {
+    initNavToggle();
+  }
+</script>   <section class="content-screen" data-astro-cid-mejek24l> <div class="notes-container" data-astro-cid-mejek24l> <!-- 科目按钮导航 --> <div class="category-buttons" data-astro-cid-mejek24l> <button class="category-btn active" data-category="all" data-astro-cid-mejek24l>All</button>  </div> <!-- 笔记列表 --> <div class="notes-list" data-astro-cid-mejek24l>  </div> <!-- 笔记内容展示 --> <div class="note-detail-view" id="note-detail-view" data-astro-cid-mejek24l> <button class="note-detail-close" id="note-detail-close" data-astro-cid-mejek24l>✕</button> <div class="note-detail-content" data-astro-cid-mejek24l></div> </div> <!-- 隐藏的笔记内容容器 --> <div id="note-html-storage" style="display: none;" data-astro-cid-mejek24l>  </div> </div> </section>  </div> <script>
+      // 初始化主题
+      const initTheme = () => {
+        const html = document.documentElement;
+        const savedTheme = localStorage.getItem('theme');
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const theme = savedTheme || (prefersDark ? 'dark' : 'light');
+        html.setAttribute('data-theme', theme);
+      };
+
+      // 初始化导航按钮状态
+      const initNavStatus = () => {
+        const path = window.location.pathname;
+        const buttons = document.querySelectorAll('.nav-toggle-btn');
+        
+        buttons.forEach(btn => {
+          btn.classList.remove('active');
+          const target = btn.getAttribute('data-target');
+          
+          if ((target === 'blog' && path === '/') ||
+              (target === 'notes' && path.includes('/notes')) ||
+              (target === 'photos' && path.includes('/photos')) ||
+              (target === 'mcgames' && path.includes('/mc'))) {
+            btn.classList.add('active');
+          }
+        });
+      };
+
+      initTheme();
+      initNavStatus();
+      document.addEventListener('DOMContentLoaded', () => {
+        initTheme();
+        initNavStatus();
+      });
+    </script>  </body> </html> <script>(function(){const notesByCategory = "{}";
+const sortedNotes = "[]";
+
+  // 背景图片设置和视差滚动效果
+  const parallaxBg = document.querySelector('.parallax-bg');
+  if (parallaxBg) {
+    // 根据主题模式设置背景图片
+    function setBackgroundImage() {
+      const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
+      const backgroundImage = isDarkMode ? '/bg_photos/notes2.jpg' : '/bg_photos/notes1.jpg';
+      parallaxBg.style.backgroundImage = `url('${backgroundImage}')`;
+    }
+
+    // 初始化背景
+    setBackgroundImage();
+
+    // 监听主题变化
+    const observer = new MutationObserver(() => {
+      setBackgroundImage();
+    });
+
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['data-theme']
+    });
+
+    // 监听container的动画结束
+    const container = document.querySelector('.container');
+    if (container) {
+      container.addEventListener('animationend', () => {
+        const scrolled = window.scrollY;
+        parallaxBg.style.transform = `translate3d(0, -${scrolled}px, 0)`;
+      });
+    }
+
+    // 只在滚动时更新
+    window.addEventListener('scroll', () => {
+      const scrolled = window.scrollY;
+      parallaxBg.style.transform = `translate3d(0, -${scrolled}px, 0)`;
+    }, { passive: true });
+  }
+
+  // 科目过滤功能
+  document.querySelectorAll('.category-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+      const selectedCategory = this.dataset.category;
+      
+      // 更新按钮状态
+      document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
+      this.classList.add('active');
+      
+      // 过滤笔记
+      document.querySelectorAll('.notes-category-group').forEach(group => {
+        if (selectedCategory === 'all' || group.dataset.category === selectedCategory) {
+          group.style.display = 'block';
+        } else {
+          group.style.display = 'none';
+        }
+      });
+    });
+  });
+
+  // 笔记点击展开功能
+  const noteDetailView = document.getElementById('note-detail-view');
+  const noteDetailClose = document.getElementById('note-detail-close');
+  const noteDetailContent = noteDetailView.querySelector('.note-detail-content');
+  const noteHtmlStorage = document.getElementById('note-html-storage');
+  
+  document.querySelectorAll('.note-item-clickable').forEach(item => {
+    item.addEventListener('click', function() {
+      const noteId = this.dataset.noteId;
+      const noteContainer = noteHtmlStorage.querySelector(`[data-note-id="${noteId}"]`);
+      
+      if (noteContainer) {
+        const noteTitle = noteContainer.getAttribute('data-note-title');
+        const noteHtml = noteContainer.innerHTML;
+        noteDetailContent.innerHTML = `<h2>${noteTitle}</h2>${noteHtml}`;
+        noteDetailView.classList.add('active');
+        document.body.style.overflow = 'hidden';
+      }
+    });
+  });
+  
+  // 关闭笔记详情
+  noteDetailClose.addEventListener('click', () => {
+    noteDetailView.classList.remove('active');
+    document.body.style.overflow = 'auto';
+  });
+  
+  // 点击背景关闭
+  noteDetailView.addEventListener('click', (e) => {
+    if (e.target === noteDetailView) {
+      noteDetailView.classList.remove('active');
+      document.body.style.overflow = 'auto';
+    }
+  });
+})();</script> 
