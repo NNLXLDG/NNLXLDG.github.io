@@ -2,79 +2,18 @@
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import NavToggle from "../../components/NavToggle.astro";
 import { marked } from 'marked';
-import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
+import { getCollection } from 'astro:content';
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const notesDir = path.join(__dirname, '../../..', 'public', 'content');
+// 获取所有笔记
+const notes = await getCollection('notes');
 
 // 辅助函数：规范化分类名
 function normalizeCategory(category: string): string {
   return category.toLowerCase().trim().replace(/\s+/g, '-');
 }
 
-// 辅助函数：格式化显示的分类名
-function formatCategoryDisplay(category: string): string {
-  return category
-    .replace(/-/g, ' ')
-    .split(' ')
-    .map((w: string) => w.charAt(0).toUpperCase() + w.slice(1))
-    .join(' ');
-}
-
-// 从文件系统读取所有笔记
-function readNotesFromFS() {
-  const notes: any[] = [];
-  
-  // 如果目录不存在，直接返回空数组
-  if (!fs.existsSync(notesDir)) {
-    return notes;
-  }
-  
-  const walkDir = (dir: string, relative: string = '') => {
-    try {
-      const files = fs.readdirSync(dir);
-      files.forEach(file => {
-        const fullPath = path.join(dir, file);
-        const relPath = relative ? `${relative}/${file}` : file;
-        
-        if (fs.statSync(fullPath).isDirectory()) {
-          if (file !== 'assets') {
-            walkDir(fullPath, relPath);
-          }
-        } else if (file.endsWith('.md')) {
-          const body = fs.readFileSync(fullPath, 'utf-8');
-          notes.push({
-            id: relPath,
-            body: body,
-            filePath: fullPath
-          });
-        }
-      });
-    } catch (error) {
-      console.error(`Error reading directory ${dir}:`, error);
-    }
-  };
-  
-  walkDir(notesDir);
-  return notes;
-}
-
-const notes = readNotesFromFS();
-
-// 辅助函数：获取文件修改时间
-function getFileModTime(filePath: string): number {
-  try {
-    return fs.statSync(filePath).mtimeMs || 0;
-  } catch {
-    return 0;
-  }
-}
-
 // 辅助函数：从笔记 ID 提取元数据
-function extractMetadata(note: any) {
-  const id = note.id;
+function extractMetadata(id: string) {
   const parts = id.split('/').filter((p: string) => p);
   
   const category = parts[0] || '';
@@ -107,15 +46,17 @@ function getTitleFromFilename(filename: string): string {
 }
 
 // 处理并编译所有笔记内容
-const notesWithMeta = notes.map(note => {
-  const metadata = extractMetadata(note);
-  const modTime = fs.statSync(note.filePath).mtimeMs || 0;
+const notesWithMeta = notes.map((note: any) => {
+  const metadata = extractMetadata(note.id);
   
   // 使用 marked 将 markdown 编译为 HTML
   let htmlContent = marked(note.body);
   
   // 处理图片路径：将占位符转换为正确的访问路径
-  const noteDir = note.id.substring(0, note.id.lastIndexOf('/'));
+  // note.id 格式: "category/subcategory/filename.md" 或 "category/filename.md"
+  const notePathParts = note.id.split('/');
+  const fileName = notePathParts[notePathParts.length - 1];
+  const noteDir = note.id.substring(0, note.id.length - fileName.length - 1);
   
   // 替换 __IMGPLACEHOLDER__filename__IMGPLACEHOLDER__ 为正确的路径
   htmlContent = htmlContent.replace(/__IMGPLACEHOLDER__(.+?)__IMGPLACEHOLDER__/g, 
@@ -124,24 +65,7 @@ const notesWithMeta = notes.map(note => {
       let decodedName = decodeURIComponent(imgName);
       // 移除任何前缀的 assets/ 或其他路径
       decodedName = decodedName.split('/').pop();
-      return `/content/${noteDir}/assets/${decodedName}`;
-    }
-  );
-  
-  // 处理 markdown 直接生成的相对路径图片引用
-  // 匹配 src="xxxx" 或 src='xxxx' 中不包含 / 的相对路径（既不是 http(s):// 也不是 / 开头）
-  htmlContent = htmlContent.replace(/src=["'](?!(?:https?:|\/))([^"']+)["']/g, 
-    (match, imgName) => {
-      // 仅处理看起来像文件名的情况（包含扩展名）
-      if (/\.\w+$/.test(imgName)) {
-        // 解码 URL 编码的文件名
-        let decodedName = decodeURIComponent(imgName);
-        // 移除任何前缀的 assets/
-        decodedName = decodedName.split('/').pop();
-        // 返回正确的路径 - 首先尝试 assets 文件夹，否则使用同级目录
-        return `src="/content/${noteDir}/${decodedName}"`;
-      }
-      return match;
+      return `/content/notes/${noteDir}/assets/${decodedName}`;
     }
   );
   
@@ -149,18 +73,23 @@ const notesWithMeta = notes.map(note => {
     ...note,
     category: metadata.category,
     title: metadata.title,
-    modTime: modTime,
     htmlContent: htmlContent
   };
 });
 
-// 按修改时间倒序（最新的在前），相同时间按 title 字母顺序排
+// 按 title 字母顺序排序
 const sortedNotes = notesWithMeta.sort((a, b) => {
-  if (b.modTime !== a.modTime) {
-    return b.modTime - a.modTime; // 最新的在前
-  }
-  return a.title.localeCompare(b.title); // 相同时间按 title 排序
+  return a.title.localeCompare(b.title);
 });
+
+// 格式化分类名用于显示
+function formatCategoryDisplay(category: string): string {
+  return category
+    .replace(/-/g, ' ')
+    .split(' ')
+    .map((w: string) => w.charAt(0).toUpperCase() + w.slice(1))
+    .join(' ');
+}
 
 // 获取所有分类（去重 + 排序）
 const uniqueCategories = Array.from(new Map(

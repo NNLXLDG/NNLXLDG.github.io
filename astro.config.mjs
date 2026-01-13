@@ -3,58 +3,71 @@ import sitemap from '@astrojs/sitemap';
 import { defineConfig } from 'astro/config';
 import fs from 'fs';
 import path from 'path';
-import { fileURLToPath } from 'url';
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-
-// 复制 notes 内容到 public 的函数
-const copyNotesContent = () => {
-  const srcDir = path.join(__dirname, 'src', 'content', 'notes');
-  const destDir = path.join(__dirname, 'public', 'content', 'notes');
+// 递归复制目录
+function copyDirRecursive(src, dest) {
+  if (!fs.existsSync(dest)) {
+    fs.mkdirSync(dest, { recursive: true });
+  }
   
-  if (!fs.existsSync(srcDir)) return;
-  
-  // 递归复制所有文件
-  const copyDir = (src, dest) => {
-    if (!fs.existsSync(dest)) {
-      fs.mkdirSync(dest, { recursive: true });
+  const files = fs.readdirSync(src);
+  files.forEach(file => {
+    const srcPath = path.join(src, file);
+    const destPath = path.join(dest, file);
+    
+    if (fs.statSync(srcPath).isDirectory()) {
+      copyDirRecursive(srcPath, destPath);
+    } else {
+      fs.copyFileSync(srcPath, destPath);
     }
-    const files = fs.readdirSync(src);
-    files.forEach(file => {
-      const srcPath = path.join(src, file);
-      const destPath = path.join(dest, file);
-      const stat = fs.statSync(srcPath);
-      
-      if (stat.isDirectory()) {
-        copyDir(srcPath, destPath);
-      } else {
-        fs.copyFileSync(srcPath, destPath);
-      }
-    });
-  };
-  
-  copyDir(srcDir, destDir);
-};
+  });
+}
 
 export default defineConfig({
   site: 'https://github.com/NNLXLDG/NNLXLDG.github.io',
   output: 'static',
-  integrations: [
-    sitemap(),
-    {
-      name: 'copy-notes-content',
-      hooks: {
-        'astro:server:start': () => {
-          // 在开发服务器启动时复制
-          copyNotesContent();
-          console.log('✓ Notes content synced to public');
-        },
-        'astro:build:start': () => {
-          // 在构建开始时复制
-          copyNotesContent();
-          console.log('✓ Notes content synced to public for build');
-        },
-      },
-    },
-  ],
+  integrations: [sitemap()],
+  hooks: {
+    'astro:build:done': async ({ dir }) => {
+      // 复制所有图片资源到 dist/content/notes
+      const srcNotesDir = './src/content/notes';
+      const destDir = dir instanceof URL ? dir.pathname : String(dir);
+      const destContentDir = path.join(destDir, 'content', 'notes');
+      
+      console.log('🔍 Build hook: sourceDir=', srcNotesDir, ', destDir=', destContentDir);
+      
+      try {
+        // 创建目标目录
+        if (!fs.existsSync(destContentDir)) {
+          fs.mkdirSync(destContentDir, { recursive: true });
+        }
+        
+        // 递归遍历并复制所有 assets 文件夹中的文件
+        function copyAssetsFromDir(srcDir, destBase) {
+          const files = fs.readdirSync(srcDir, { withFileTypes: true });
+          
+          files.forEach(file => {
+            const srcPath = path.join(srcDir, file.name);
+            
+            if (file.isDirectory()) {
+              if (file.name === 'assets') {
+                // 找到 assets 文件夹，复制其内容
+                const relativePath = path.relative(srcNotesDir, srcDir);
+                const destPath = path.join(destBase, relativePath, 'assets');
+                copyDirRecursive(srcPath, destPath);
+              } else {
+                // 继续递归搜索子目录
+                copyAssetsFromDir(srcPath, destBase);
+              }
+            }
+          });
+        }
+        
+        copyAssetsFromDir(srcNotesDir, destContentDir);
+        console.log('✓ Notes assets copied to dist');
+      } catch (error) {
+        console.error('✗ Failed to copy notes assets:', error);
+      }
+    }
+  }
 });

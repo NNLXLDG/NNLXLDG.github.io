@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
-    "deploy": "gh-pages -d dist",
+    "deploy": "npm run build && touch dist/.nojekyll && gh-pages -d dist --dotfiles",
     "preview": "astro preview",
     "astro": "astro"
   },
