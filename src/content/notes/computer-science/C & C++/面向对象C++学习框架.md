@@ -1,9 +1,3 @@
----
-title: "Computer Science"
-category: "Computer Science"
-order: 2
----
-
 # 面向对象的C++学习框架
 
 

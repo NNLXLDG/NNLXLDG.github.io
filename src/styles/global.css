@@ -204,3 +204,272 @@ html[data-theme="light"] .nav a:hover {
   box-shadow: 0 12px 26px rgba(0,0,0,.22);
 }
 .small{font-size:14px}
+
+/* Notes 页面样式 */
+.notes-container {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.category-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 40px;
+  justify-content: center;
+}
+
+.category-btn {
+  padding: 10px 20px;
+  border: 1px solid var(--border);
+  background: var(--card-bg);
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.category-btn:hover {
+  border-color: var(--accent);
+  background: rgba(99, 102, 241, 0.1);
+}
+
+.category-btn.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: white;
+}
+
+.notes-list {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0;
+}
+
+.notes-category-group {
+  display: contents;
+}
+
+.note-item-clickable {
+  padding: 16px 20px;
+  border: 1px solid var(--border);
+  border-bottom: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: var(--card-bg);
+}
+
+.note-item-clickable:last-child {
+  border-bottom: 1px solid var(--border);
+  border-radius: 0 0 12px 12px;
+}
+
+.note-item-clickable:first-child {
+  border-radius: 12px 12px 0 0;
+}
+
+.note-item-clickable:hover {
+  background: rgba(99, 102, 241, 0.08);
+  border-color: var(--accent);
+  transform: translateX(4px);
+}
+
+.note-title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--text);
+  letter-spacing: -0.01em;
+}
+
+/* 笔记详情弹窗 */
+.note-detail-view {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  z-index: 200;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.note-detail-view.active {
+  display: flex;
+}
+
+.note-detail-content {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 40px;
+  max-width: 800px;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+  animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.note-detail-close {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: var(--muted);
+  transition: color 0.3s ease;
+  z-index: 201;
+  padding: 8px;
+}
+
+.note-detail-close:hover {
+  color: var(--text);
+}
+
+/* Markdown 内容样式 */
+.note-detail-content h1,
+.note-detail-content h2,
+.note-detail-content h3,
+.note-detail-content h4,
+.note-detail-content h5,
+.note-detail-content h6 {
+  margin-top: 24px;
+  margin-bottom: 12px;
+  font-weight: 600;
+}
+
+.note-detail-content h1 {
+  font-size: 28px;
+  border-bottom: 2px solid var(--accent);
+  padding-bottom: 8px;
+}
+
+.note-detail-content h2 {
+  font-size: 24px;
+}
+
+.note-detail-content h3 {
+  font-size: 20px;
+}
+
+.note-detail-content p {
+  margin: 12px 0;
+  line-height: 1.8;
+  color: var(--text);
+}
+
+.note-detail-content ul,
+.note-detail-content ol {
+  margin: 12px 0;
+  padding-left: 24px;
+  color: var(--text);
+}
+
+.note-detail-content li {
+  margin: 6px 0;
+  line-height: 1.6;
+}
+
+.note-detail-content code {
+  background: rgba(99, 102, 241, 0.15);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'Monaco', 'Menlo', monospace;
+  font-size: 14px;
+  color: var(--accent);
+}
+
+.note-detail-content pre {
+  background: var(--card-bg);
+  padding: 16px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  overflow-x: auto;
+  margin: 16px 0;
+}
+
+.note-detail-content pre code {
+  background: none;
+  padding: 0;
+  color: var(--text);
+}
+
+.note-detail-content blockquote {
+  border-left: 4px solid var(--accent);
+  padding-left: 16px;
+  margin: 16px 0;
+  color: var(--muted);
+  font-style: italic;
+}
+
+.note-detail-content a {
+  color: var(--accent);
+  text-decoration: none;
+  border-bottom: 1px dotted var(--accent);
+  transition: all 0.3s ease;
+}
+
+.note-detail-content a:hover {
+  border-bottom-style: solid;
+  opacity: 0.8;
+}
+
+.note-detail-content img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  margin: 16px 0;
+  border: 1px solid var(--border);
+}
+
+.note-detail-content table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 16px 0;
+}
+
+.note-detail-content table th,
+.note-detail-content table td {
+  padding: 12px;
+  text-align: left;
+  border: 1px solid var(--border);
+}
+
+.note-detail-content table th {
+  background: var(--card-bg);
+  font-weight: 600;
+  color: var(--text);
+}
+
+.note-detail-content table tr:nth-child(even) {
+  background: rgba(99, 102, 241, 0.03);
+}
+
+/* 响应式设计 */
+@media (max-width: 600px) {
+  .note-detail-content {
+    padding: 24px;
+    max-width: 100%;
+  }
+  
+  .category-buttons {
+    justify-content: flex-start;
+    overflow-x: auto;
+  }
+}

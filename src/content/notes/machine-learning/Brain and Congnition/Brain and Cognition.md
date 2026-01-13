@@ -1,11 +1,3 @@
----
-title: "Machine Learning"
-category: "Machine Learning"
-order: 4
----
-
-
-
 # 脑与认知科学 Brain and Congition
 尽管特定的大脑区域负责某项独立的功能，但这些区域组成的网络以及它们之间的连接才是人类表现出的整体行为的原因
 

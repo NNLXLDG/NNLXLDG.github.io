@@ -5,41 +5,63 @@ import { getCollection } from 'astro:content';
 import fs from 'fs';
 import path from 'path';
 
+// 辅助函数：规范化分类名（统一为小写，替换空格为连字符）
+function normalizeCategory(category: string): string {
+  return category.toLowerCase().trim().replace(/\s+/g, '-');
+}
+
+// 辅助函数：格式化显示的分类名（将连字符替换为空格，首字母大写）
+function formatCategoryDisplay(category: string): string {
+  return category
+    .replace(/-/g, ' ')
+    .split(' ')
+    .map((w: string) => w.charAt(0).toUpperCase() + w.slice(1))
+    .join(' ');
+}
+
 const notes = await getCollection('notes');
+
+// 辅助函数：从文件名提取标题（去掉 .md 扩展名）
+function getTitleFromFilename(filename: string): string {
+  // 移除 .md 扩展名
+  return filename.replace(/\.md$/, '');
+}
 
 // 辅助函数：从文件路径提取类别和标题
 function extractMetadata(note: any) {
-  const id = note.id; // 例如: "software-tools/typora/index.md" 或 "mathematics/index.md"
-  const parts = id.split('/');
+  const id = note.id; // 例如: "computer-science/C & C++/C语言学习框架.md"
+  const parts = id.split('/').filter(p => p); // 分割路径并去空
   
-  let category = parts[0]; // 第一级：分类
+  const category = parts[0] || ''; // 第一级：分类
   let title = '';
   
-  // 如果有 frontmatter 中的 category，使用它
-  if (note.data.category) {
-    category = note.data.category;
-  }
-  
-  // 判断是否是二级结构（有子文件夹）
-  if (parts.length === 3) {
-    // 二级结构：software-tools/typora/index.md
-    // title 来自第二级文件夹名（parts[1]）
-    title = parts[1];
+  // 判断结构层级
+  if (parts.length >= 3) {
+    // 三级或更深：category/subfolder/filename.md
+    // title 来自文件名（最后一部分）
+    title = getTitleFromFilename(parts[parts.length - 1]);
   } else if (parts.length === 2) {
-    // 一级结构：mathematics/index.md
-    // title 来自 category 名
-    title = category;
+    // 二级：category/filename.md（如 mathematics/index.md）
+    const filename = parts[1];
+    if (filename === 'index.md') {
+      // index.md 时，title 来自 category 名
+      title = category;
+    } else {
+      // 其他 md 文件时，来自文件名
+      title = getTitleFromFilename(filename);
+    }
+  } else if (parts.length === 1) {
+    // 只有文件名（不应该出现）
+    title = getTitleFromFilename(parts[0]);
   }
   
-  // 将文件夹名转换为标题格式（横线改空格，首字母大写）
+  // 格式化标题：横线改空格，首字母大写
   title = title.replace(/-/g, ' ').split(' ').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
   
-  // 如果有 frontmatter 中的 title，使用它
-  if (note.data.title) {
-    title = note.data.title;
-  }
+  // 规范化分类名（统一为小写）
+  const normalizedCategory = normalizeCategory(category);
   
-  return { category, title };
+  return { category: normalizedCategory, title };
 }
 
 // 获取文件的修改时间
@@ -72,10 +94,27 @@ const sortedNotes = notesWithMeta.sort((a, b) => {
   return a.title.localeCompare(b.title); // 相同时间按 title 排序
 });
 
-// 获取所有分类（去重）
+// 获取所有分类（去重 + 排序）
 const uniqueCategories = Array.from(new Map(
-  sortedNotes.map(note => [note.category, { title: note.category, category: note.category }])
-).values());
+  sortedNotes.map(note => [
+    note.category,
+    { 
+      key: note.category,
+      title: formatCategoryDisplay(note.category),
+      category: note.category
+    }
+  ])
+).values())
+.sort((a, b) => a.title.localeCompare(b.title));
+
+// 按分类分组笔记
+const notesByCategory: Record<string, typeof sortedNotes> = {};
+sortedNotes.forEach(note => {
+  if (!notesByCategory[note.category]) {
+    notesByCategory[note.category] = [];
+  }
+  notesByCategory[note.category].push(note);
+});
 ---
 
 <BaseLayout title="Notes">
@@ -97,26 +136,35 @@ const uniqueCategories = Array.from(new Map(
       <div class="category-buttons">
         <button class="category-btn active" data-category="all">All</button>
         {uniqueCategories.map((cat) => (
-          <button class="category-btn" data-category={cat.category}>
-            {cat.title.replace(/-/g, ' ').split(' ').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
+          <button class="category-btn" data-category={cat.key}>
+            {cat.title}
           </button>
         ))}
       </div>
 
       <!-- 笔记列表 -->
       <div class="notes-list">
-        {sortedNotes.map((note) => (
-          <div class="note-section" data-category={note.category}>
-            <h3 class="note-section-title">{note.title}</h3>
-            <div class="note-content" set:html={note.body}></div>
+        {uniqueCategories.map((cat) => (
+          <div class="notes-category-group" data-category={cat.key}>
+            {notesByCategory[cat.key]?.map((note) => (
+              <div class="note-item-clickable" data-note-id={note.id}>
+                <h3 class="note-title">{note.title}</h3>
+              </div>
+            ))}
           </div>
         ))}
+      </div>
+
+      <!-- 笔记内容展示 -->
+      <div class="note-detail-view" id="note-detail-view">
+        <button class="note-detail-close" id="note-detail-close">✕</button>
+        <div class="note-detail-content"></div>
       </div>
     </div>
   </section>
 </BaseLayout>
 
-<script>
+<script define:vars={{ notesByCategory: JSON.stringify(notesByCategory), sortedNotes: JSON.stringify(sortedNotes.map(n => ({ id: n.id, category: n.category, title: n.title, body: n.body }))) }}>
   // 背景图片设置和视差滚动效果
   const parallaxBg = document.querySelector('.parallax-bg');
   if (parallaxBg) {
@@ -125,7 +173,6 @@ const uniqueCategories = Array.from(new Map(
       const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
       const backgroundImage = isDarkMode ? '/bg_photos/notes2.jpg' : '/bg_photos/notes1.jpg';
       parallaxBg.style.backgroundImage = `url('${backgroundImage}')`;
-      console.log('[notes] Background image set to:', backgroundImage);
     }
 
     // 初始化背景
@@ -167,14 +214,49 @@ const uniqueCategories = Array.from(new Map(
       this.classList.add('active');
       
       // 过滤笔记
-      document.querySelectorAll('.note-section').forEach(section => {
-        if (selectedCategory === 'all' || section.dataset.category === selectedCategory) {
-          section.style.display = 'block';
+      document.querySelectorAll('.notes-category-group').forEach(group => {
+        if (selectedCategory === 'all' || group.dataset.category === selectedCategory) {
+          group.style.display = 'block';
         } else {
-          section.style.display = 'none';
+          group.style.display = 'none';
         }
       });
     });
+  });
+
+  // 笔记点击展开功能
+  const noteDetailView = document.getElementById('note-detail-view');
+  const noteDetailClose = document.getElementById('note-detail-close');
+  const noteDetailContent = noteDetailView.querySelector('.note-detail-content');
+  
+  // 解析并显示笔记
+  const notesData = JSON.parse(sortedNotes);
+  
+  document.querySelectorAll('.note-item-clickable').forEach(item => {
+    item.addEventListener('click', function() {
+      const noteId = this.dataset.noteId;
+      const note = notesData.find(n => n.id === noteId);
+      
+      if (note) {
+        noteDetailContent.innerHTML = `<h2>${note.title}</h2>${note.body}`;
+        noteDetailView.classList.add('active');
+        document.body.style.overflow = 'hidden';
+      }
+    });
+  });
+  
+  // 关闭笔记详情
+  noteDetailClose.addEventListener('click', () => {
+    noteDetailView.classList.remove('active');
+    document.body.style.overflow = 'auto';
+  });
+  
+  // 点击背景关闭
+  noteDetailView.addEventListener('click', (e) => {
+    if (e.target === noteDetailView) {
+      noteDetailView.classList.remove('active');
+      document.body.style.overflow = 'auto';
+    }
   });
 </script>
 
