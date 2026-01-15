@@ -3,6 +3,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
 import NavToggle from "../../components/NavToggle.astro";
 import { marked } from 'marked';
 import { getCollection } from 'astro:content';
+import katex from 'katex';
 
 // 获取所有笔记
 const notes = await getCollection('notes');
@@ -45,6 +46,45 @@ function getTitleFromFilename(filename: string): string {
   return filename.replace(/\.md$/, '');
 }
 
+// 渲染 LaTeX 公式为 HTML（使用 KaTeX）
+function renderLatexFormulas(html: string): string {
+  const katexOptions = {
+    throwOnError: false,
+    strict: false,
+    trust: true,
+  };
+
+  // 匹配 $$...$$ （块级公式）
+  html = html.replace(/\$\$([\s\S]*?)\$\$/g, (match, formula) => {
+    try {
+      const rendered = katex.renderToString(formula.trim(), {
+        ...katexOptions,
+        displayMode: true,
+      });
+      return `<div class="katex-block">${rendered}</div>`;
+    } catch (e) {
+      console.error('KaTeX error:', e);
+      return match;
+    }
+  });
+
+  // 匹配 $...$ （行内公式）
+  html = html.replace(/\$([^\$\n]+?)\$/g, (match, formula) => {
+    try {
+      const rendered = katex.renderToString(formula.trim(), {
+        ...katexOptions,
+        displayMode: false,
+      });
+      return `<span class="katex-inline">${rendered}</span>`;
+    } catch (e) {
+      console.error('KaTeX error:', e);
+      return match;
+    }
+  });
+
+  return html;
+}
+
 // 处理并编译所有笔记内容
 const notesWithMeta = notes.map((note: any) => {
   const metadata = extractMetadata(note.id);
@@ -68,6 +108,9 @@ const notesWithMeta = notes.map((note: any) => {
       return `/content/notes/${noteDir}/assets/${decodedName}`;
     }
   );
+  
+  // 渲染 LaTeX 公式
+  htmlContent = renderLatexFormulas(htmlContent);
   
   return {
     ...note,

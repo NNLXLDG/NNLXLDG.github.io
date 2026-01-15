@@ -484,3 +484,30 @@ html[data-theme="light"] .nav a:hover {
     overflow-x: auto;
   }
 }
+
+/* KaTeX Math Formula Styling */
+.katex-block {
+  display: block;
+  text-align: center;
+  margin: 1em 0;
+  padding: 0.5em 0;
+  overflow-x: auto;
+}
+
+.katex-inline {
+  display: inline;
+  margin: 0 0.1em;
+}
+
+/* Dark mode formula adjustment */
+html {
+  --katex-color: rgba(255, 255, 255, 0.88);
+}
+
+html[data-theme="light"] {
+  --katex-color: rgba(20, 20, 30, 0.92);
+}
+
+.katex {
+  color: var(--katex-color) !important;
+}
