@@ -427,13 +427,34 @@
         initTheme();
         initNavStatus();
       });
-    </script>  </body> </html> <script type="module">const r=document.querySelector(".parallax-bg");if(r){let t=function(){const n=document.documentElement.getAttribute("data-theme")==="dark"?"/bg_photos/photo2.jpg":"/bg_photos/photo1.jpg";r.style.backgroundImage=`url('${n}')`};t(),new MutationObserver(()=>{t()}).observe(document.documentElement,{attributes:!0,attributeFilter:["data-theme"]}),r.style.transform="translate3d(0, 0, 0)",window.addEventListener("scroll",()=>{const o=window.scrollY;r.style.transform=`translate3d(0, -${o}px, 0)`},{passive:!0})}const u=document.getElementById("photos-container"),f=["1.jpg","2.jpg","3-1.jpg","3-2.jpg","4-1.jpg","4-2.jpg","5-1.jpg","5-2.jpg","6.jpg"];async function l(){const t=[];for(const e of f){const o=new Image;o.src=`/Photos/${e}`,await new Promise(n=>{o.onload=()=>{t.push({file:e,width:o.naturalWidth,height:o.naturalHeight,aspectRatio:o.naturalWidth/o.naturalHeight}),n()},o.onerror=s=>{console.error(`Failed to load image: /Photos/${e}`,s),n()}})}return console.log("Loaded photos:",t),t}function c(t){const e=[];t[0]&&e.push([t[0]]),t[1]&&e.push([t[1]]);for(let o=2;o<t.length;o+=2){const n=[];t[o]&&n.push(t[o]),t[o+1]&&n.push(t[o+1]),e.push(n)}return console.log("Groups:",e),e}function a(t){const e=window.innerWidth;let o="";for(const n of t)if(n.length===1){const s=n[0],i=e/s.aspectRatio;o+=`
-          <div class="photo-row" style="display: flex; height: ${i}px; width: 100%; overflow: hidden;">
-            <img src="/Photos/${s.file}" alt="photo" style="width: 100%; height: 100%; object-fit: cover;" />
+    </script>  </body> </html> <script type="module">const l=document.querySelector(".parallax-bg");if(l){let t=function(){const o=document.documentElement.getAttribute("data-theme")==="dark"?"/bg_photos/photo2.jpg":"/bg_photos/photo1.jpg";l.style.backgroundImage=`url('${o}')`};t(),new MutationObserver(()=>{t()}).observe(document.documentElement,{attributes:!0,attributeFilter:["data-theme"]}),l.style.transform="translate3d(0, 0, 0)",window.addEventListener("scroll",()=>{const e=window.scrollY;l.style.transform=`translate3d(0, -${e}px, 0)`},{passive:!0})}const j=document.getElementById("photos-container"),z=["1.jpg","2.jpg","3-1.jpg","3-2.jpg","4-1.jpg","4-2.jpg","5-1.jpg","5-2.jpg","6.jpg"];async function w(){const t=[];for(const s of z){const e=new Image;e.src=`/photos/${s}`,await new Promise(o=>{e.onload=()=>{t.push({file:s,width:e.naturalWidth,height:e.naturalHeight,aspectRatio:e.naturalWidth/e.naturalHeight}),o()},e.onerror=d=>{console.error(`Failed to load image: /photos/${s}`,d),o()}})}return console.log("Loaded photos:",t),t}function f(t){const s=[];t[0]&&s.push([t[0]]),t[1]&&s.push([t[1]]);for(let e=2;e<t.length;e+=2){const o=[];t[e]&&o.push(t[e]),t[e+1]&&o.push(t[e+1]),s.push(o)}return console.log("Groups:",s),s}function m(t){const s=window.innerWidth;let e="",o=0;const d=window.innerHeight;let g=0;const c=new Set;for(const n of t){if(g>d*1.5)break;if(n.length===1){const i=n[0],r=s/i.aspectRatio;c.add(o),g+=r,o++}else if(n.length===2){const i=s/2,r=i/n[0].aspectRatio,a=i/n[1].aspectRatio,h=Math.max(r,a);c.add(o),c.add(o+1),g+=h,o+=2}}o=0;for(const n of t)if(n.length===1){const i=n[0],r=s/i.aspectRatio,h=c.has(o)?"eager":"lazy";e+=`
+          <div class="photo-row" style="display: flex; height: ${r}px; width: 100%; overflow: hidden;">
+            <img 
+              src="/photos/${i.file}" 
+              alt="photo" 
+              style="width: 100%; height: 100%; object-fit: cover;" 
+              loading="${h}"
+              sizes="(max-width: 768px) 100vw, (max-width: 1024px) 100vw, 100vw"
+              decoding="async"
+            />
           </div>
-        `}else if(n.length===2){const s=n[0],i=n[1],h=e/2,d=h/s.aspectRatio,g=h/i.aspectRatio,p=Math.max(d,g);o+=`
-          <div class="photo-row" style="display: flex; height: ${p}px; width: 100%; overflow: hidden;">
-            <img src="/Photos/${s.file}" alt="photo" style="width: 50%; height: 100%; object-fit: cover; flex-shrink: 0;" />
-            <img src="/Photos/${i.file}" alt="photo" style="width: 50%; height: 100%; object-fit: cover; flex-shrink: 0;" />
+        `,o++}else if(n.length===2){const i=n[0],r=n[1],a=s/2,h=a/i.aspectRatio,p=a/r.aspectRatio,v=Math.max(h,p),x=c.has(o),y=c.has(o+1),b=x?"eager":"lazy",$=y?"eager":"lazy",u="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 50vw";e+=`
+          <div class="photo-row" style="display: flex; height: ${v}px; width: 100%; overflow: hidden;">
+            <img 
+              src="/photos/${i.file}" 
+              alt="photo" 
+              style="width: 50%; height: 100%; object-fit: cover; flex-shrink: 0;" 
+              loading="${b}"
+              sizes="${u}"
+              decoding="async"
+            />
+            <img 
+              src="/photos/${r.file}" 
+              alt="photo" 
+              style="width: 50%; height: 100%; object-fit: cover; flex-shrink: 0;" 
+              loading="${$}"
+              sizes="${u}"
+              decoding="async"
+            />
           </div>
-        `}console.log("Generated HTML length:",o.length),u.innerHTML=o,console.log("Container updated")}l().then(t=>{const e=c(t);a(e)});window.addEventListener("resize",()=>{l().then(t=>{const e=c(t);a(e)})});</script> 
+        `,o+=2}console.log("Generated HTML length:",e.length),j.innerHTML=e,console.log("Container updated")}w().then(t=>{const s=f(t);m(s)});window.addEventListener("resize",()=>{w().then(t=>{const s=f(t);m(s)})});</script> 
